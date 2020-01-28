@@ -7,9 +7,14 @@ import {getBoardTasksTemplate} from './js/components/board-tasks.js';
 import {getButtonLoadMoreTemplate} from './js/components/button-load-more.js';
 import {getCardTaskTemplate} from './js/components/card-task.js';
 import {getCardTaskEditTemplate} from './js/components/card-edit-task.js';
+import {getTasksList} from './js/taskData.js';
+import {getFilters} from './js/filterData.js';
 
 const NUMBER_OF_CARDS = 3;
-const templatesMain = [getSiteMenuTemplate(), getSearchTemplate(), getFilterTemplate(), getBoardTemplate()];
+
+const tasksData = getTasksList(NUMBER_OF_CARDS);
+
+const templatesMain = [getSiteMenuTemplate(), getSearchTemplate(), getFilterTemplate(getFilters(tasksData)), getBoardTemplate()];
 const templatesBoard = [getSortTemplate(), getBoardTasksTemplate(), getButtonLoadMoreTemplate()];
 
 const mainElement = document.querySelector(`.main`);
@@ -29,5 +34,5 @@ const boardTasksElement = mainElement.querySelector(`.board__tasks`);
 renderTemplate(boardTasksElement, getCardTaskEditTemplate());
 
 for (let i = 0; i < NUMBER_OF_CARDS; i++) {
-  renderTemplate(boardTasksElement, getCardTaskTemplate());
+  renderTemplate(boardTasksElement, getCardTaskTemplate(tasksData[i]));
 }
