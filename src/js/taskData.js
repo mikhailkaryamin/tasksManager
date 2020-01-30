@@ -1,5 +1,6 @@
 const MS_IN_WEEK = 86400000;
 import {getRandom} from './util.js';
+import {COLOURS} from './consts.js';
 
 const getTask = () => ({
   description: [
@@ -24,13 +25,7 @@ const getTask = () => ({
     `intensive`,
     `keks`
   ]),
-  color: [
-    `black`,
-    `yellow`,
-    `blue`,
-    `green`,
-    `pink`,
-  ][getRandom(4)],
+  color: COLOURS[getRandom(4)],
   isFavorite: Boolean(getRandom(1)),
   isArchive: Boolean(getRandom(1))
 });

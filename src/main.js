@@ -1,3 +1,4 @@
+import {getRandom} from './js/util.js';
 import {getSiteMenuTemplate} from './js/components/site-menu.js';
 import {getSearchTemplate} from './js/components/search.js';
 import {getFilterTemplate} from './js/components/filters.js';
@@ -10,12 +11,13 @@ import {getCardTaskEditTemplate} from './js/components/card-edit-task.js';
 import {getTasksList} from './js/taskData.js';
 import {getFilters} from './js/filterData.js';
 
-const NUMBER_OF_CARDS = 3;
+const NUMBER_OF_CARDS = getRandom(25, 3);
+const NUMBER_LOAD_CARD = 8;
+let startLoadCards = 0;
 
 const tasksData = getTasksList(NUMBER_OF_CARDS);
 
 const templatesMain = [getSiteMenuTemplate(), getSearchTemplate(), getFilterTemplate(getFilters(tasksData)), getBoardTemplate()];
-const templatesBoard = [getSortTemplate(), getBoardTasksTemplate(), getButtonLoadMoreTemplate()];
 
 const mainElement = document.querySelector(`.main`);
 
@@ -27,12 +29,31 @@ templatesMain.forEach((template) => renderTemplate(mainElement, template));
 
 const boardElement = mainElement.querySelector(`.board`);
 
-templatesBoard.forEach((template) => renderTemplate(boardElement, template));
+renderTemplate(boardElement, getSortTemplate());
+renderTemplate(boardElement, getBoardTasksTemplate());
 
 const boardTasksElement = mainElement.querySelector(`.board__tasks`);
 
-renderTemplate(boardTasksElement, getCardTaskEditTemplate());
+const renderTasks = () => {
+  if (startLoadCards >= tasksData.length) {
+    return;
+  }
 
-for (let i = 0; i < NUMBER_OF_CARDS; i++) {
-  renderTemplate(boardTasksElement, getCardTaskTemplate(tasksData[i]));
-}
+  let currentLoadTasksList = tasksData.slice(startLoadCards, startLoadCards + NUMBER_LOAD_CARD);
+
+  currentLoadTasksList.forEach((task) => renderTemplate(boardTasksElement, getCardTaskTemplate(task)));
+  startLoadCards += NUMBER_LOAD_CARD;
+
+  if (startLoadCards < tasksData.length && startLoadCards === NUMBER_LOAD_CARD) {
+    renderTemplate(boardElement, getButtonLoadMoreTemplate());
+    const loadMoreElement = boardElement.querySelector(`.load-more`);
+    loadMoreElement.addEventListener(`click`, () => renderTasks());
+  } else if (startLoadCards >= tasksData.length && startLoadCards > NUMBER_LOAD_CARD) {
+    const loadMoreElement = boardElement.querySelector(`.load-more`);
+    loadMoreElement.remove();
+  }
+};
+
+renderTemplate(boardTasksElement, getCardTaskEditTemplate(tasksData[0]));
+
+renderTasks();

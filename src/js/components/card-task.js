@@ -1,7 +1,7 @@
 import {hasValueObj} from '../util.js';
 
 export const getCardTaskTemplate = ({description, dueDate, repeatingDays, tags, color, isFavorite, isArchive}) => {
-  return `<article class="card card--${color} ${hasValueObj(repeatingDays, true) ? `card--repeat` : ``} ">
+  return `<article class="card card--${color} ${hasValueObj(repeatingDays, true) ? `card--repeat` : ``}">
             <div class="card__form">
               <div class="card__inner">
                 <div class="card__control">
