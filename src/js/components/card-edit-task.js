@@ -1,5 +1,6 @@
 import {COLOURS} from '../consts.js';
-import {hasValueObj} from '../util.js';
+import {hasValueObj} from '../utils.js';
+import {createElement} from '../utils.js';
 
 const TIME_OPTIONS = {
   hour12: `true`,
@@ -9,17 +10,37 @@ const TIME_OPTIONS = {
   minute: `2-digit`
 };
 
-export const getCardTaskEditTemplate = ({description, dueDate, repeatingDays, tags, color, isFavorite, isArchive}) => {
-  return `<article class="card card--edit card--${color} ${hasValueObj(repeatingDays, true) ? `card--repeat` : ``}">
+export class CardEditTask {
+  constructor({description, dueDate, repeatingDays, tags, color, isFavorite, isArchive}) {
+    this._description = description;
+    this._dueDate = dueDate;
+    this._repeatingDays = repeatingDays;
+    this._tags = tags;
+    this._color = color;
+    this._isFavorite = isFavorite;
+    this._isArchive = isArchive;
+    this._element = null;
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  getTemplate() {
+    return `<article class="card card--edit card--${this._color} ${hasValueObj(this._repeatingDays, true) ? `card--repeat` : ``}">
             <form class="card__form" method="get">
               <div class="card__inner">
                 <div class="card__control">
-                  <button type="button" class="card__btn card__btn--archive ${isArchive ? `card__btn--disabled` : ``}">
+                  <button type="button" class="card__btn card__btn--archive ${this._isArchive ? `card__btn--disabled` : ``}">
                     archive
                   </button>
                   <button
                     type="button"
-                    class="card__btn card__btn--favorites ${isFavorite ? `card__btn--disabled` : ``}"
+                    class="card__btn card__btn--favorites ${this._isFavorite ? `card__btn--disabled` : ``}"
                   >
                     favorites
                   </button>
@@ -37,7 +58,7 @@ export const getCardTaskEditTemplate = ({description, dueDate, repeatingDays, ta
                       class="card__text"
                       placeholder="Start typing your text here..."
                       name="text"
-                    >${description}</textarea>
+                    >${this._description}</textarea>
                   </label>
                 </div>
 
@@ -55,7 +76,7 @@ export const getCardTaskEditTemplate = ({description, dueDate, repeatingDays, ta
                             type="text"
                             placeholder=""
                             name="date"
-                            value="${dueDate.toLocaleDateString(`en-GB`, TIME_OPTIONS)}"
+                            value="${this._dueDate.toLocaleDateString(`en-GB`, TIME_OPTIONS)}"
                           />
                         </label>
                       </fieldset>
@@ -66,13 +87,13 @@ export const getCardTaskEditTemplate = ({description, dueDate, repeatingDays, ta
 
                       <fieldset class="card__repeat-days">
                         <div class="card__repeat-days-inner">
-                        ${Object.keys(repeatingDays).map((day) =>`<input
+                        ${Object.keys(this._repeatingDays).map((day) =>`<input
                           class="visually-hidden card__repeat-day-input"
                           type="checkbox"
                           id="repeat-${day}-4"
                           name="repeat"
                           value="${day}"
-                          ${repeatingDays[day] ? `checked` : ``}
+                          ${this._repeatingDays[day] ? `checked` : ``}
                         />
                         <label class="card__repeat-day" for="repeat-${day}-4"
                           >${day}</label
@@ -83,7 +104,7 @@ export const getCardTaskEditTemplate = ({description, dueDate, repeatingDays, ta
 
                     <div class="card__hashtag">
                       <div class="card__hashtag-list">
-                      ${Array.from(tags).map((tag) =>`<span class="card__hashtag-inner">
+                      ${Array.from(this._tags).map((tag) =>`<span class="card__hashtag-inner">
                           <input
                             type="hidden"
                             name="hashtag"
@@ -119,7 +140,7 @@ export const getCardTaskEditTemplate = ({description, dueDate, repeatingDays, ta
                       class="card__color-input card__color-input--${colorEl} visually-hidden"
                       name="color"
                       value="${colorEl}"
-                      ${colorEl === color ? `checked` : ``}
+                      ${colorEl === this._color ? `checked` : ``}
                     />
                     <label
                       for="color-${colorEl}-4"
@@ -137,4 +158,5 @@ export const getCardTaskEditTemplate = ({description, dueDate, repeatingDays, ta
               </div>
             </form>
           </article>`;
-};
+  }
+}

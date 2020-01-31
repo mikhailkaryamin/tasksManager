@@ -1,19 +1,40 @@
-import {hasValueObj} from '../util.js';
+import {hasValueObj} from '../utils.js';
+import {createElement} from '../utils.js';
 
-export const getCardTaskTemplate = ({description, dueDate, repeatingDays, tags, color, isFavorite, isArchive}) => {
-  return `<article class="card card--${color} ${hasValueObj(repeatingDays, true) ? `card--repeat` : ``}">
+export class CardTask {
+  constructor({description, dueDate, repeatingDays, tags, color, isFavorite, isArchive}) {
+    this._description = description;
+    this._dueDate = dueDate;
+    this._repeatingDays = repeatingDays;
+    this._tags = tags;
+    this._color = color;
+    this._isFavorite = isFavorite;
+    this._isArchive = isArchive;
+    this._element = null;
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  getTemplate() {
+    return `<article class="card card--${this._color} ${hasValueObj(this._repeatingDays, true) ? `card--repeat` : ``}">
             <div class="card__form">
               <div class="card__inner">
                 <div class="card__control">
                   <button type="button" class="card__btn card__btn--edit">
                     edit
                   </button>
-                  <button type="button" class="card__btn card__btn--archive ${isArchive ? `` : `card__btn--disabled`}">
+                  <button type="button" class="card__btn card__btn--archive ${this._isArchive ? `` : `card__btn--disabled`}">
                     archive
                   </button>
                   <button
                     type="button"
-                    class="card__btn card__btn--favorites ${isFavorite ? `` : `card__btn--disabled`}"
+                    class="card__btn card__btn--favorites ${this._isFavorite ? `` : `card__btn--disabled`}"
                   >
                     favorites
                   </button>
@@ -26,7 +47,7 @@ export const getCardTaskTemplate = ({description, dueDate, repeatingDays, tags, 
                 </div>
 
                 <div class="card__textarea-wrap">
-                  <p class="card__text">${description}</p>
+                  <p class="card__text">${this._description}</p>
                 </div>
 
                 <div class="card__settings">
@@ -35,7 +56,7 @@ export const getCardTaskTemplate = ({description, dueDate, repeatingDays, tags, 
                       <div class="card__date-deadline">
                         <p class="card__input-deadline-wrap">
                           <span class="card__date">
-                            ${dueDate.toDateString()}
+                            ${this._dueDate.toDateString()}
                           </span>
                         </p>
                       </div>
@@ -43,7 +64,7 @@ export const getCardTaskTemplate = ({description, dueDate, repeatingDays, tags, 
 
                     <div class="card__hashtag">
                       <div class="card__hashtag-list">
-                        ${Array.from(tags).map((tag) =>`<span class="card__hashtag-inner">
+                        ${Array.from(this._tags).map((tag) =>`<span class="card__hashtag-inner">
                           <span class="card__hashtag-name">
                             #${tag}
                           </span>
@@ -55,4 +76,6 @@ export const getCardTaskTemplate = ({description, dueDate, repeatingDays, tags, 
               </div>
             </div>
           </article>`;
-};
+  }
+}
+

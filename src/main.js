@@ -1,13 +1,13 @@
-import {getRandom} from './js/util.js';
-import {getSiteMenuTemplate} from './js/components/site-menu.js';
-import {getSearchTemplate} from './js/components/search.js';
-import {getFilterTemplate} from './js/components/filters.js';
-import {getBoardTemplate} from './js/components/board.js';
-import {getSortTemplate} from './js/components/sort.js';
-import {getBoardTasksTemplate} from './js/components/board-tasks.js';
-import {getButtonLoadMoreTemplate} from './js/components/button-load-more.js';
-import {getCardTaskTemplate} from './js/components/card-task.js';
-import {getCardTaskEditTemplate} from './js/components/card-edit-task.js';
+import {getRandom, render, isEscKeyDown, unrender} from './js/utils.js';
+import {SiteMenu} from './js/components/site-menu.js';
+import {Search} from './js/components/search.js';
+import {Filters} from './js/components/filters.js';
+import {Board} from './js/components/board.js';
+import {Sort} from './js/components/sort.js';
+import {BoardTasks} from './js/components/board-tasks.js';
+import {ButtonLoadMore} from './js/components/button-load-more.js';
+import {CardTask} from './js/components/card-task.js';
+import {CardEditTask} from './js/components/card-edit-task.js';
 import {getTasksList} from './js/taskData.js';
 import {getFilters} from './js/filterData.js';
 
@@ -17,22 +17,67 @@ let startLoadCards = 0;
 
 const tasksData = getTasksList(NUMBER_OF_CARDS);
 
-const templatesMain = [getSiteMenuTemplate(), getSearchTemplate(), getFilterTemplate(getFilters(tasksData)), getBoardTemplate()];
+const siteMenu = new SiteMenu();
+const search = new Search();
+const filters = new Filters(getFilters(tasksData));
+const board = new Board();
+const sort = new Sort();
+const boardTasks = new BoardTasks();
+const buttonLoadMore = new ButtonLoadMore();
 
 const mainElement = document.querySelector(`.main`);
 
-const renderTemplate = function (elementContainer, template) {
-  elementContainer.insertAdjacentHTML(`beforeend`, template);
-};
-
-templatesMain.forEach((template) => renderTemplate(mainElement, template));
+render(mainElement, siteMenu.getElement());
+render(mainElement, search.getElement());
+render(mainElement, filters.getElement());
+render(mainElement, board.getElement());
 
 const boardElement = mainElement.querySelector(`.board`);
 
-renderTemplate(boardElement, getSortTemplate());
-renderTemplate(boardElement, getBoardTasksTemplate());
+render(boardElement, sort.getElement());
+render(boardElement, boardTasks.getElement());
 
 const boardTasksElement = mainElement.querySelector(`.board__tasks`);
+
+const renderTask = (taskMock) => {
+  const task = new CardTask(taskMock);
+  const taskEdit = new CardEditTask(taskMock);
+
+  const closeTaskEdit = () => {
+    boardTasksElement.replaceChild(task.getElement(), taskEdit.getElement());
+    document.removeEventListener(`keydown`, onEscKeyDown);
+  };
+
+  const onEscKeyDown = (evt) => {
+    isEscKeyDown(evt, closeTaskEdit);
+  };
+
+  task.getElement()
+    .querySelector(`.card__btn--edit`)
+    .addEventListener(`click`, () => {
+      boardTasksElement.replaceChild(taskEdit.getElement(), task.getElement());
+      document.addEventListener(`keydown`, onEscKeyDown);
+    });
+
+  taskEdit.getElement().querySelector(`textarea`)
+    .addEventListener(`focus`, () => {
+      document.removeEventListener(`keydown`, onEscKeyDown);
+    });
+
+  taskEdit.getElement().querySelector(`textarea`)
+    .addEventListener(`blur`, () => {
+      document.addEventListener(`keydown`, onEscKeyDown);
+    });
+
+  taskEdit.getElement()
+    .querySelector(`.card__save`)
+    .addEventListener(`click`, () => {
+      boardTasksElement.replaceChild(task.getElement(), taskEdit.getElement());
+      document.removeEventListener(`keydown`, onEscKeyDown);
+    });
+
+  render(boardTasksElement, task.getElement());
+};
 
 const renderTasks = () => {
   if (startLoadCards >= tasksData.length) {
@@ -41,19 +86,19 @@ const renderTasks = () => {
 
   let currentLoadTasksList = tasksData.slice(startLoadCards, startLoadCards + NUMBER_LOAD_CARD);
 
-  currentLoadTasksList.forEach((task) => renderTemplate(boardTasksElement, getCardTaskTemplate(task)));
+  currentLoadTasksList.forEach((task) => renderTask(task));
   startLoadCards += NUMBER_LOAD_CARD;
 
   if (startLoadCards < tasksData.length && startLoadCards === NUMBER_LOAD_CARD) {
-    renderTemplate(boardElement, getButtonLoadMoreTemplate());
+    render(boardElement, buttonLoadMore.getElement());
+
     const loadMoreElement = boardElement.querySelector(`.load-more`);
     loadMoreElement.addEventListener(`click`, () => renderTasks());
   } else if (startLoadCards >= tasksData.length && startLoadCards > NUMBER_LOAD_CARD) {
     const loadMoreElement = boardElement.querySelector(`.load-more`);
-    loadMoreElement.remove();
+
+    unrender(loadMoreElement);
   }
 };
-
-renderTemplate(boardTasksElement, getCardTaskEditTemplate(tasksData[0]));
 
 renderTasks();

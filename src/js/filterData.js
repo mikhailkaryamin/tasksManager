@@ -1,4 +1,4 @@
-import {hasValueObj} from './util.js';
+import {hasValueObj} from './utils.js';
 
 export const getFilters = (tasks) => ([
   {

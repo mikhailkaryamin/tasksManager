@@ -1,5 +1,5 @@
 const MS_IN_WEEK = 86400000;
-import {getRandom} from './util.js';
+import {getRandom} from './utils.js';
 import {COLOURS} from './consts.js';
 
 const getTask = () => ({
