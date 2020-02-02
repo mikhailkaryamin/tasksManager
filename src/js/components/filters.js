@@ -1,19 +1,11 @@
-import {createElement} from '../utils.js';
+import {AbstractComponent} from './abstract-component.js';
 
 const FILTERS = [`all`, `overdue`, `today`, `favorites`, `repeating`, `tags`, `archive`];
 
-export class Filters {
+export class Filters extends AbstractComponent {
   constructor(filtersData) {
+    super();
     this._filtersData = filtersData;
-    this._element = null;
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
   }
 
   getTemplate() {

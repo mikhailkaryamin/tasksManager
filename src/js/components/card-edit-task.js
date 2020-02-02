@@ -1,6 +1,6 @@
 import {COLOURS} from '../consts.js';
 import {hasValueObj} from '../utils.js';
-import {createElement} from '../utils.js';
+import {AbstractComponent} from './abstract-component.js';
 
 const TIME_OPTIONS = {
   hour12: `true`,
@@ -10,8 +10,9 @@ const TIME_OPTIONS = {
   minute: `2-digit`
 };
 
-export class CardEditTask {
+export class CardEditTask extends AbstractComponent {
   constructor({description, dueDate, repeatingDays, tags, color, isFavorite, isArchive}) {
+    super();
     this._description = description;
     this._dueDate = dueDate;
     this._repeatingDays = repeatingDays;
@@ -19,15 +20,6 @@ export class CardEditTask {
     this._color = color;
     this._isFavorite = isFavorite;
     this._isArchive = isArchive;
-    this._element = null;
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
   }
 
   getTemplate() {
