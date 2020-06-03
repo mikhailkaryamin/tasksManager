@@ -67,17 +67,6 @@
         </section>
       </section>
 
-      <section class="main__search search container">
-        <input
-          type="text"
-          id="search__input"
-          class="search__input"
-          placeholder="START TYPING — SEARCH BY WORD, #HASHTAG OR DATE"
-          value="#work"
-        />
-        <label class="visually-hidden" for="search__input">Поиск</label>
-      </section>
-
       <section class="main__filter filter container">
         <input
           type="radio"
@@ -85,9 +74,10 @@
           class="filter__input visually-hidden"
           name="filter"
           checked
+          disabled
         />
         <label for="filter__all" class="filter__label">
-          ALL <span class="filter__all-count">15</span></label
+          All <span class="filter__all-count">0</span></label
         >
         <input
           type="radio"
@@ -97,7 +87,7 @@
           disabled
         />
         <label for="filter__overdue" class="filter__label"
-          >OVERDUE <span class="filter__overdue-count">0</span></label
+          >Overdue <span class="filter__overdue-count">0</span></label
         >
         <input
           type="radio"
@@ -107,34 +97,27 @@
           disabled
         />
         <label for="filter__today" class="filter__label"
-          >TODAY <span class="filter__today-count">0</span></label
+          >Today <span class="filter__today-count">0</span></label
         >
         <input
           type="radio"
           id="filter__favorites"
           class="filter__input visually-hidden"
           name="filter"
+          disabled
         />
         <label for="filter__favorites" class="filter__label"
-          >FAVORITES <span class="filter__favorites-count">7</span></label
+          >Favorites <span class="filter__favorites-count">0</span></label
         >
         <input
           type="radio"
           id="filter__repeating"
           class="filter__input visually-hidden"
           name="filter"
+          disabled
         />
         <label for="filter__repeating" class="filter__label"
-          >Repeating <span class="filter__repeating-count">2</span></label
-        >
-        <input
-          type="radio"
-          id="filter__tags"
-          class="filter__input visually-hidden"
-          name="filter"
-        />
-        <label for="filter__tags" class="filter__label"
-          >Tags <span class="filter__tags-count">6</span></label
+          >Repeating <span class="filter__repeating-count">0</span></label
         >
         <input
           type="radio"
@@ -143,22 +126,15 @@
           name="filter"
         />
         <label for="filter__archive" class="filter__label"
-          >ARCHIVE <span class="filter__archive-count">115</span></label
+          >Archive <span class="filter__archive-count">115</span></label
         >
       </section>
 
-      <section class="result container">
-        <button class="result__back">back</button>
-
-        <section class="result__group">
-          <h2 class="result__title">
-            #work<span class="result__count"></span>
-          </h2>
-          <p class="result__empty">no matches found...</p>
-          <div class="result__cards"></div>
-        </section>
+      <section class="board container">
+        <p class="board__no-tasks">
+          Loading...
+        </p>
       </section>
-
     </main>
   </body>
 </html>
