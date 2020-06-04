@@ -390,7 +390,6 @@ const mainControlEl = mainEl.querySelector(`.main__control`);
 
 renderTemplate(mainControlEl, createMenuTemplate());
 renderTemplate(mainEl, createFiltersTemplate());
-
 renderTemplate(mainEl, createBoardTemplate());
 
 const boardEl = mainEl.querySelector(`.board`);
