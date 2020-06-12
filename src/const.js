@@ -19,10 +19,14 @@ const DescriptionItems = [
   `Exercitation consequat elit irure eu magna proident commodo.`,
   `Amet ad reprehenderit est eiusmod esse.`,
 ];
+const TASK_COUNT = 22;
+const SHOWING_TASKS_COUNT = 8;
 
 export {
   MONTH_NAMES,
   DAYS,
   COLORS,
   DescriptionItems,
+  TASK_COUNT,
+  SHOWING_TASKS_COUNT,
 };

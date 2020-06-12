@@ -20,6 +20,8 @@ const DefaultRepeatingDays = {
 const generateRepeatingDays = () => {
   return Object.assign({}, DefaultRepeatingDays, {
     "mo": Math.random() > 0.5,
+    "we": Math.random() > 0.5,
+    "sa": Math.random() > 0.5,
   });
 };
 
