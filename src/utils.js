@@ -1,3 +1,4 @@
+import {NodePosition} from './const.js';
 const castTimeFormat = (value) => {
   return value < 10 ? `0${value}` : String(value);
 };
@@ -36,9 +37,31 @@ const createElement = (template) => {
   return newElement.firstChild;
 };
 
+const render = (container, template, position = NodePosition.APPEND) => {
+  switch (position) {
+    case NodePosition.APPEND:
+      container.append(template);
+      break;
+    case NodePosition.PREPEND:
+      container.prepend(template);
+      break;
+  }
+};
+
+const onEscKeyDown = (evt, action) => {
+  const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
+
+  if (isEscKey) {
+    action();
+    document.removeEventListener(`keydown`, onEscKeyDown);
+  }
+};
+
 export {
   formatTime,
   getRandomArrayItem,
   getRandomDate,
   createElement,
+  render,
+  onEscKeyDown,
 };

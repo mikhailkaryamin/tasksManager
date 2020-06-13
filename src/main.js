@@ -12,55 +12,66 @@ import {
   TASK_COUNT,
   SHOWING_TASKS_COUNT,
   Sing,
-  NodePosition,
 } from './const.js';
+import {
+  render,
+  onEscKeyDown,
+} from './utils.js';
 
 const filters = generateFilters();
 const tasks = generateTasks(TASK_COUNT);
 
-const Menu = new MenuComponent().getElement();
-const Board = new BoardComponent().getElement();
-const Filters = new FiltersComponent(filters).getElement();
-const LoadMoreButton = new LoadMoreButtonComponent().getElement();
-const Sort = new SortComponent().getElement();
-const TasksList = new TasksListComponent().getElement();
+const menuComponent = new MenuComponent();
+const boardComponent = new BoardComponent();
+const filtersComponent = new FiltersComponent(filters);
+const loadMoreButtonComponent = new LoadMoreButtonComponent();
+const sortComponent = new SortComponent();
+const tasksListComponent = new TasksListComponent();
 
-const render = (container, template, position = NodePosition.APPEND) => {
-  switch (position) {
-    case NodePosition.APPEND:
-      container.append(template);
-      break;
-    case NodePosition.PREPEND:
-      container.prepend(template);
-      break;
-  }
-};
+const mainEl = document.querySelector(`.main`);
+const mainControlEl = mainEl.querySelector(`.main__control`);
 
-let taskCountRendered = 1;
+render(mainControlEl, menuComponent.getElement());
+render(mainEl, filtersComponent.getElement());
 
-const renderTasks = () => {
-  const startTaskRender = taskCountRendered;
-  const endTaskRender = taskCountRendered + SHOWING_TASKS_COUNT;
-  const tasksForRender = tasks.slice(startTaskRender, endTaskRender);
+const renderTask = (tasksListEl, task) => {
+  const cardTaskEl = new CardTaskComponent(task).getElement();
+  const cardTaskEditEl = new CardTaskEditComponent(task).getElement();
 
-  tasksForRender.forEach((task) => render(tasksListEl, new CardTaskComponent(task).getElement()));
+  const editButtonEl = cardTaskEl.querySelector(`.card__btn--edit`);
+  const saveButtonEl = cardTaskEditEl.querySelector(`.card__save`);
 
-  if (taskCountRendered === 1 && tasks.length > endTaskRender) {
-    renderLoadMoreButton(Sing.RENDER);
-  }
-  if (taskCountRendered !== 1 && tasks.length < endTaskRender) {
-    renderLoadMoreButton(Sing.REMOVE);
-  }
+  const onCloseEdit = (evt) => {
+    onEscKeyDown(evt, replaceEditToTask);
+  };
 
-  taskCountRendered += SHOWING_TASKS_COUNT;
+  const replaceTaskToEdit = () => {
+    tasksListEl.replaceChild(cardTaskEditEl, cardTaskEl);
+    editButtonEl.removeEventListener(`click`, replaceTaskToEdit);
+
+    document.addEventListener(`keydown`, onCloseEdit);
+    saveButtonEl.addEventListener(`click`, replaceEditToTask);
+  };
+
+  const replaceEditToTask = () => {
+    tasksListEl.replaceChild(cardTaskEl, cardTaskEditEl);
+
+    editButtonEl.addEventListener(`click`, replaceTaskToEdit);
+    saveButtonEl.removeEventListener(`click`, replaceEditToTask);
+  };
+
+  editButtonEl.addEventListener(`click`, replaceTaskToEdit);
+
+  render(tasksListEl, cardTaskEl);
 };
 
 const renderLoadMoreButton = (sing) => {
-  if (sing === Sing.RENDER) {
-    render(boardEl, LoadMoreButton);
+  const boardEl = boardComponent.getElement();
 
+  if (sing === Sing.RENDER) {
+    render(boardEl, loadMoreButtonComponent.getElement());
     const loadMoreButtonEl = boardEl.querySelector(`.load-more`);
-    loadMoreButtonEl.addEventListener(`click`, renderTasks);
+    loadMoreButtonEl.addEventListener(`click`, renderBoard);
   }
 
   if (sing === Sing.REMOVE) {
@@ -69,20 +80,31 @@ const renderLoadMoreButton = (sing) => {
   }
 };
 
-const mainEl = document.querySelector(`.main`);
-const mainControlEl = mainEl.querySelector(`.main__control`);
+let renderedTasksCount = 1;
 
-render(mainControlEl, Menu);
-render(mainEl, Filters);
-render(mainEl, Board);
+const renderBoard = () => {
+  const startTaskRender = renderedTasksCount;
+  const endTaskRender = renderedTasksCount + SHOWING_TASKS_COUNT;
+  const tasksForRender = tasks.slice(startTaskRender, endTaskRender);
 
-const boardEl = mainEl.querySelector(`.board`);
+  const boardEl = boardComponent.getElement();
 
-render(boardEl, Sort);
-render(boardEl, TasksList);
+  render(mainEl, boardEl);
+  render(boardEl, sortComponent.getElement());
+  render(boardEl, tasksListComponent.getElement());
 
-const tasksListEl = boardEl.querySelector(`.board__tasks`);
+  const tasksListEl = boardEl.querySelector(`.board__tasks`);
+  tasksForRender.forEach((task) => renderTask(tasksListEl, task));
 
-render(tasksListEl, new CardTaskEditComponent(tasks[0]).getElement());
+  if (tasks.length > endTaskRender) {
+    renderLoadMoreButton(Sing.RENDER);
+  }
 
-renderTasks();
+  if (renderedTasksCount !== 1 && tasks.length < endTaskRender) {
+    renderLoadMoreButton(Sing.REMOVE);
+  }
+
+  renderedTasksCount += SHOWING_TASKS_COUNT;
+};
+
+renderBoard();
