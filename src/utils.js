@@ -29,8 +29,16 @@ const getRandomIntegerNumber = (min, max) => {
   return min + Math.floor(Math.random() * (max - min));
 };
 
+const createElement = (template) => {
+  const newElement = document.createElement(`div`);
+  newElement.innerHTML = template;
+
+  return newElement.firstChild;
+};
+
 export {
   formatTime,
   getRandomArrayItem,
   getRandomDate,
+  createElement,
 };

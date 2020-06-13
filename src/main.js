@@ -1,53 +1,69 @@
-import {createBoardTemplate} from './components/board.js';
-import {createCardTaskTemplate} from './components/card-task.js';
-import {createCardTaskEditTemplate} from './components/card-task-edit.js';
-import {createFiltersTemplate} from './components/filters.js';
-import {createLoadMoreButtonTemplate} from './components/load-more-button.js';
-import {createMenuTemplate} from './components/menu.js';
-import {createSortTemplate} from './components/sort.js';
-import {createTasksListTemplate} from './components/tasks-list.js';
+import BoardComponent from './components/board.js';
+import CardTaskComponent from './components/card-task.js';
+import CardTaskEditComponent from './components/card-task-edit.js';
+import FiltersComponent from './components/filters.js';
+import LoadMoreButtonComponent from './components/load-more-button.js';
+import MenuComponent from './components/menu.js';
+import SortComponent from './components/sort.js';
+import TasksListComponent from './components/tasks-list.js';
 import {generateFilters} from './mock/filter.js';
 import {generateTasks} from './mock/task.js';
 import {
   TASK_COUNT,
   SHOWING_TASKS_COUNT,
+  Sing,
+  NodePosition,
 } from './const.js';
 
 const filters = generateFilters();
 const tasks = generateTasks(TASK_COUNT);
 
-const renderTemplate = (container, template, position = `beforeend`) => {
-  container.insertAdjacentHTML(position, template);
+const Menu = new MenuComponent().getElement();
+const Board = new BoardComponent().getElement();
+const Filters = new FiltersComponent(filters).getElement();
+const LoadMoreButton = new LoadMoreButtonComponent().getElement();
+const Sort = new SortComponent().getElement();
+const TasksList = new TasksListComponent().getElement();
+
+const render = (container, template, position = NodePosition.APPEND) => {
+  switch (position) {
+    case NodePosition.APPEND:
+      container.append(template);
+      break;
+    case NodePosition.PREPEND:
+      container.prepend(template);
+      break;
+  }
 };
 
 let taskCountRendered = 1;
 
 const renderTasks = () => {
   const startTaskRender = taskCountRendered;
-  const finishTaskRender = taskCountRendered + SHOWING_TASKS_COUNT;
-  const tasksForRender = tasks.slice(startTaskRender, finishTaskRender);
+  const endTaskRender = taskCountRendered + SHOWING_TASKS_COUNT;
+  const tasksForRender = tasks.slice(startTaskRender, endTaskRender);
 
-  tasksForRender.forEach((task) => renderTemplate(tasksListEl, createCardTaskTemplate(task)));
+  tasksForRender.forEach((task) => render(tasksListEl, new CardTaskComponent(task).getElement()));
 
-  if (taskCountRendered === 1 && tasks.length > finishTaskRender) {
-    renderLoadMoreButton(`render`);
+  if (taskCountRendered === 1 && tasks.length > endTaskRender) {
+    renderLoadMoreButton(Sing.RENDER);
   }
-  if (taskCountRendered !== 1 && tasks.length < finishTaskRender) {
-    renderLoadMoreButton(`remove`);
+  if (taskCountRendered !== 1 && tasks.length < endTaskRender) {
+    renderLoadMoreButton(Sing.REMOVE);
   }
 
   taskCountRendered += SHOWING_TASKS_COUNT;
 };
 
 const renderLoadMoreButton = (sing) => {
-  if (sing === `render`) {
-    renderTemplate(boardEl, createLoadMoreButtonTemplate());
+  if (sing === Sing.RENDER) {
+    render(boardEl, LoadMoreButton);
 
     const loadMoreButtonEl = boardEl.querySelector(`.load-more`);
     loadMoreButtonEl.addEventListener(`click`, renderTasks);
   }
 
-  if (sing === `remove`) {
+  if (sing === Sing.REMOVE) {
     const loadMoreButtonEl = boardEl.querySelector(`.load-more`);
     loadMoreButtonEl.remove();
   }
@@ -56,17 +72,17 @@ const renderLoadMoreButton = (sing) => {
 const mainEl = document.querySelector(`.main`);
 const mainControlEl = mainEl.querySelector(`.main__control`);
 
-renderTemplate(mainControlEl, createMenuTemplate());
-renderTemplate(mainEl, createFiltersTemplate(filters));
-renderTemplate(mainEl, createBoardTemplate());
+render(mainControlEl, Menu);
+render(mainEl, Filters);
+render(mainEl, Board);
 
 const boardEl = mainEl.querySelector(`.board`);
 
-renderTemplate(boardEl, createSortTemplate());
-renderTemplate(boardEl, createTasksListTemplate());
+render(boardEl, Sort);
+render(boardEl, TasksList);
 
 const tasksListEl = boardEl.querySelector(`.board__tasks`);
 
-renderTemplate(tasksListEl, createCardTaskEditTemplate(tasks[0]));
+render(tasksListEl, new CardTaskEditComponent(tasks[0]).getElement());
 
 renderTasks();
