@@ -6,6 +6,7 @@ import LoadMoreButtonComponent from './components/load-more-button.js';
 import MenuComponent from './components/menu.js';
 import SortComponent from './components/sort.js';
 import TasksListComponent from './components/tasks-list.js';
+import NoTasks from './components/no-tasks.js';
 import {generateFilters} from './mock/filter.js';
 import {generateTasks} from './mock/task.js';
 import {
@@ -27,6 +28,7 @@ const filtersComponent = new FiltersComponent(filters);
 const loadMoreButtonComponent = new LoadMoreButtonComponent();
 const sortComponent = new SortComponent();
 const tasksListComponent = new TasksListComponent();
+const noTasksComponent = new NoTasks();
 
 const mainEl = document.querySelector(`.main`);
 const mainControlEl = mainEl.querySelector(`.main__control`);
@@ -90,6 +92,12 @@ const renderBoard = () => {
   const boardEl = boardComponent.getElement();
 
   render(mainEl, boardEl);
+
+  if (tasks.length === 0) {
+    render(boardEl, noTasksComponent.getElement());
+    return;
+  }
+
   render(boardEl, sortComponent.getElement());
   render(boardEl, tasksListComponent.getElement());
 
