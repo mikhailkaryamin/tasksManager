@@ -3,7 +3,10 @@ import {
   DAYS,
   COLORS,
 } from "../const.js";
-import {formatTime} from '../utils.js';
+import {
+  formatTime,
+  createElement,
+} from '../utils.js';
 
 const createColorMarkup = (colors, currentColor) => {
   return colors
@@ -113,7 +116,7 @@ const createCardTaskEditTemplate = (task) => {
                 </button>
 
                 ${
-    isRepeatingTask ? 
+    isRepeatingTask ?
       `<fieldset class="card__repeat-days">
             <div class="card__repeat-days-inner">
               ${repeatingDaysMarkup}
@@ -140,6 +143,27 @@ const createCardTaskEditTemplate = (task) => {
   );
 };
 
-export {
-  createCardTaskEditTemplate,
-};
+class CardTaskEdit {
+  constructor(task) {
+    this._task = task;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createCardTaskEditTemplate(this._task);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
+export default CardTaskEdit;

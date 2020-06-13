@@ -21,6 +21,14 @@ const DescriptionItems = [
 ];
 const TASK_COUNT = 22;
 const SHOWING_TASKS_COUNT = 8;
+const NodePosition = {
+  APPEND: `append`,
+  PREPEND: `prepend`,
+};
+const Sing = {
+  RENDER: `render`,
+  REMOVE: `remove`,
+};
 
 export {
   MONTH_NAMES,
@@ -29,4 +37,6 @@ export {
   DescriptionItems,
   TASK_COUNT,
   SHOWING_TASKS_COUNT,
+  NodePosition,
+  Sing,
 };
