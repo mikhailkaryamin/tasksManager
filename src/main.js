@@ -7,6 +7,9 @@ import MenuComponent from './components/menu.js';
 import SortComponent from './components/sort.js';
 import TasksListComponent from './components/tasks-list.js';
 import NoTasks from './components/no-tasks.js';
+
+import BoardController from './controllers/board-controller.js';
+
 import {generateFilters} from './mock/filter.js';
 import {generateTasks} from './mock/task.js';
 import {
@@ -34,85 +37,89 @@ const sortComponent = new SortComponent();
 const tasksListComponent = new TasksListComponent();
 const noTasksComponent = new NoTasks();
 
+
+const boardEl = boardComponent.getElement();
+
 const mainEl = document.querySelector(`.main`);
+const boardController = new BoardController(mainEl);
 const mainControlEl = mainEl.querySelector(`.main__control`);
 
 render(mainControlEl, menuComponent);
 render(mainEl, filtersComponent);
 
-const renderTask = (tasksListEl, task) => {
-  const cardTask = new CardTaskComponent(task);
-  const cardTaskEdit = new CardTaskEditComponent(task);
 
-  const onCloseEdit = (evt) => {
-    onEscKeyDown(evt, replaceEditToTask);
-  };
+// const renderTask = (tasksListEl, task) => {
+//   const cardTask = new CardTaskComponent(task);
+//   const cardTaskEdit = new CardTaskEditComponent(task);
 
-  const replaceTaskToEdit = () => {
-    replaceElement(cardTaskEdit, cardTask);
-  };
+//   const onCloseEdit = (evt) => {
+//     onEscKeyDown(evt, replaceEditToTask);
+//   };
 
-  const replaceEditToTask = () => {
-    replaceElement(cardTask, cardTaskEdit);
-  };
+//   const replaceTaskToEdit = () => {
+//     replaceElement(cardTaskEdit, cardTask);
+//   };
 
-  cardTaskEdit.setSubmitHandler(() => {
-    replaceEditToTask();
-    document.removeEventListener(`keydown`, onCloseEdit);
-  });
+//   const replaceEditToTask = () => {
+//     replaceElement(cardTask, cardTaskEdit);
+//   };
 
-  cardTask.setEditButtonHandler(() => {
-    replaceTaskToEdit();
-    document.addEventListener(`keydown`, onCloseEdit);
-  });
+//   cardTaskEdit.setSubmitHandler(() => {
+//     replaceEditToTask();
+//     document.removeEventListener(`keydown`, onCloseEdit);
+//   });
 
-  render(tasksListEl, cardTask);
-};
+//   cardTask.setEditButtonHandler(() => {
+//     replaceTaskToEdit();
+//     document.addEventListener(`keydown`, onCloseEdit);
+//   });
 
-const renderLoadMoreButton = (sing) => {
-  const boardEl = boardComponent.getElement();
+//   render(tasksListEl, cardTask);
+// };
 
-  if (sing === Sing.RENDER) {
-    render(boardEl, loadMoreButtonComponent);
-    loadMoreButtonComponent.setLoadMoreButtonHandler(renderBoard);
-  }
+// const renderLoadMoreButton = (sing) => {
+//   const boardEl = boardComponent.getElement();
 
-  if (sing === Sing.REMOVE) {
-    removeElement(loadMoreButtonComponent);
-  }
-};
+//   if (sing === Sing.RENDER) {
+//     render(boardEl, loadMoreButtonComponent);
+//     loadMoreButtonComponent.setLoadMoreButtonHandler(renderBoard);
+//   }
 
-let renderedTasksCount = 1;
+//   if (sing === Sing.REMOVE) {
+//     removeElement(loadMoreButtonComponent);
+//   }
+// };
 
-const renderBoard = () => {
-  const startTaskRender = renderedTasksCount;
-  const endTaskRender = renderedTasksCount + SHOWING_TASKS_COUNT;
-  const tasksForRender = tasks.slice(startTaskRender, endTaskRender);
+// let renderedTasksCount = 1;
 
-  const boardEl = boardComponent.getElement();
+// const renderBoard = () => {
+//   const startTaskRender = renderedTasksCount;
+//   const endTaskRender = renderedTasksCount + SHOWING_TASKS_COUNT;
+//   const tasksForRender = tasks.slice(startTaskRender, endTaskRender);
 
-  render(mainEl, boardComponent);
+//   render(mainEl, boardComponent);
 
-  if (tasks.length === 0) {
-    render(boardEl, noTasksComponent.getElement());
-    return;
-  }
+//   if (tasks.length === 0) {
+//     render(boardEl, noTasksComponent.getElement());
+//     return;
+//   }
 
-  render(boardEl, sortComponent);
-  render(boardEl, tasksListComponent);
+//   render(boardEl, sortComponent);
+//   render(boardEl, tasksListComponent);
 
-  const tasksListEl = tasksListComponent.getElement();
-  tasksForRender.forEach((task) => renderTask(tasksListEl, task));
+//   const tasksListEl = tasksListComponent.getElement();
+//   tasksForRender.forEach((task) => renderTask(tasksListEl, task));
 
-  if (tasks.length > endTaskRender) {
-    renderLoadMoreButton(Sing.RENDER);
-  }
+//   if (tasks.length > endTaskRender) {
+//     renderLoadMoreButton(Sing.RENDER);
+//   }
 
-  if (renderedTasksCount !== 1 && tasks.length < endTaskRender) {
-    renderLoadMoreButton(Sing.REMOVE);
-  }
+//   if (renderedTasksCount !== 1 && tasks.length < endTaskRender) {
+//     renderLoadMoreButton(Sing.REMOVE);
+//   }
 
-  renderedTasksCount += SHOWING_TASKS_COUNT;
-};
+//   renderedTasksCount += SHOWING_TASKS_COUNT;
+// };
 
-renderBoard();
+boardController.render();
+// renderBoard(mainEl);
