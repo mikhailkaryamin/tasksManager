@@ -5,7 +5,7 @@ import {
 import {
   getRandomArrayItem,
   getRandomDate,
-} from '../utils.js';
+} from '../utils/common.js';
 
 const DefaultRepeatingDays = {
   "mo": false,

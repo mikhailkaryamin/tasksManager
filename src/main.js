@@ -15,9 +15,13 @@ import {
   Sing,
 } from './const.js';
 import {
-  render,
   onEscKeyDown,
-} from './utils.js';
+} from './utils/common.js';
+import {
+  render,
+  removeElement,
+  replaceElement,
+} from './utils/render.js';
 
 const filters = generateFilters();
 const tasks = generateTasks(TASK_COUNT);
@@ -33,52 +37,48 @@ const noTasksComponent = new NoTasks();
 const mainEl = document.querySelector(`.main`);
 const mainControlEl = mainEl.querySelector(`.main__control`);
 
-render(mainControlEl, menuComponent.getElement());
-render(mainEl, filtersComponent.getElement());
+render(mainControlEl, menuComponent);
+render(mainEl, filtersComponent);
 
 const renderTask = (tasksListEl, task) => {
-  const cardTaskEl = new CardTaskComponent(task).getElement();
-  const cardTaskEditEl = new CardTaskEditComponent(task).getElement();
-
-  const editButtonEl = cardTaskEl.querySelector(`.card__btn--edit`);
-  const saveButtonEl = cardTaskEditEl.querySelector(`.card__save`);
+  const cardTask = new CardTaskComponent(task);
+  const cardTaskEdit = new CardTaskEditComponent(task);
 
   const onCloseEdit = (evt) => {
     onEscKeyDown(evt, replaceEditToTask);
   };
 
   const replaceTaskToEdit = () => {
-    tasksListEl.replaceChild(cardTaskEditEl, cardTaskEl);
-    editButtonEl.removeEventListener(`click`, replaceTaskToEdit);
-
-    document.addEventListener(`keydown`, onCloseEdit);
-    saveButtonEl.addEventListener(`click`, replaceEditToTask);
+    replaceElement(cardTaskEdit, cardTask);
   };
 
   const replaceEditToTask = () => {
-    tasksListEl.replaceChild(cardTaskEl, cardTaskEditEl);
-
-    editButtonEl.addEventListener(`click`, replaceTaskToEdit);
-    saveButtonEl.removeEventListener(`click`, replaceEditToTask);
+    replaceElement(cardTask, cardTaskEdit);
   };
 
-  editButtonEl.addEventListener(`click`, replaceTaskToEdit);
+  cardTaskEdit.setSubmitHandler(() => {
+    replaceEditToTask();
+    document.removeEventListener(`keydown`, onCloseEdit);
+  });
 
-  render(tasksListEl, cardTaskEl);
+  cardTask.setEditButtonHandler(() => {
+    replaceTaskToEdit();
+    document.addEventListener(`keydown`, onCloseEdit);
+  });
+
+  render(tasksListEl, cardTask);
 };
 
 const renderLoadMoreButton = (sing) => {
   const boardEl = boardComponent.getElement();
 
   if (sing === Sing.RENDER) {
-    render(boardEl, loadMoreButtonComponent.getElement());
-    const loadMoreButtonEl = boardEl.querySelector(`.load-more`);
-    loadMoreButtonEl.addEventListener(`click`, renderBoard);
+    render(boardEl, loadMoreButtonComponent);
+    loadMoreButtonComponent.setLoadMoreButtonHandler(renderBoard);
   }
 
   if (sing === Sing.REMOVE) {
-    const loadMoreButtonEl = boardEl.querySelector(`.load-more`);
-    loadMoreButtonEl.remove();
+    removeElement(loadMoreButtonComponent);
   }
 };
 
@@ -91,17 +91,17 @@ const renderBoard = () => {
 
   const boardEl = boardComponent.getElement();
 
-  render(mainEl, boardEl);
+  render(mainEl, boardComponent);
 
   if (tasks.length === 0) {
     render(boardEl, noTasksComponent.getElement());
     return;
   }
 
-  render(boardEl, sortComponent.getElement());
-  render(boardEl, tasksListComponent.getElement());
+  render(boardEl, sortComponent);
+  render(boardEl, tasksListComponent);
 
-  const tasksListEl = boardEl.querySelector(`.board__tasks`);
+  const tasksListEl = tasksListComponent.getElement();
   tasksForRender.forEach((task) => renderTask(tasksListEl, task));
 
   if (tasks.length > endTaskRender) {

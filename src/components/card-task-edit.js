@@ -4,7 +4,7 @@ import {
   DAYS,
   COLORS,
 } from "../const.js";
-import {formatTime} from '../utils.js';
+import {formatTime} from '../utils/common.js';
 
 const createColorMarkup = (colors, currentColor) => {
   return colors
@@ -150,6 +150,10 @@ class CardTaskEdit extends AbstractComponent {
 
   getTemplate() {
     return createCardTaskEditTemplate(this._task);
+  }
+
+  setSubmitHandler(cb) {
+    this.getElement().querySelector(`.card__save`).addEventListener(`click`, cb);
   }
 }
 
