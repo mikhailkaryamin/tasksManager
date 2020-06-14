@@ -1,12 +1,10 @@
+import AbstractComponent from "./abstract-component.js";
 import {
   MONTH_NAMES,
   DAYS,
   COLORS,
 } from "../const.js";
-import {
-  formatTime,
-  createElement,
-} from '../utils.js';
+import {formatTime} from '../utils/common.js';
 
 const createColorMarkup = (colors, currentColor) => {
   return colors
@@ -51,9 +49,9 @@ const createRepeatingDaysMarkup = (days, repeatingDays) => {
 
 const createCardTaskEditTemplate = (task) => {
   const {
+    color,
     description,
     dueDate,
-    color,
     repeatingDays,
   } = task;
 
@@ -143,8 +141,9 @@ const createCardTaskEditTemplate = (task) => {
   );
 };
 
-class CardTaskEdit {
+class CardTaskEdit extends AbstractComponent {
   constructor(task) {
+    super();
     this._task = task;
     this._element = null;
   }
@@ -153,16 +152,8 @@ class CardTaskEdit {
     return createCardTaskEditTemplate(this._task);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  setSubmitHandler(cb) {
+    this.getElement().querySelector(`.card__save`).addEventListener(`click`, cb);
   }
 }
 
