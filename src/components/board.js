@@ -1,9 +1,8 @@
-import {
-  createElement,
-} from '../utils.js';
+import AbstractComponent from './abstract-component.js';
 
-class Board {
+class Board extends AbstractComponent {
   constructor() {
+    super();
     this._element = null;
   }
 
@@ -12,18 +11,6 @@ class Board {
       `<section class="board container">
       </section>`
     );
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
 
