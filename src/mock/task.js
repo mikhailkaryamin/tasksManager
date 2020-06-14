@@ -1,6 +1,6 @@
 import {
   COLORS,
-  DescriptionItems,
+  DESCRIPTION_ITEMS,
 } from '../const.js';
 import {
   getRandomArrayItem,
@@ -29,7 +29,7 @@ const generateTask = () => {
   const dueDate = Math.random() > 0.5 ? null : getRandomDate();
 
   return {
-    description: getRandomArrayItem(DescriptionItems),
+    description: getRandomArrayItem(DESCRIPTION_ITEMS),
     dueDate,
     repeatingDays: dueDate ? DefaultRepeatingDays : generateRepeatingDays(),
     color: getRandomArrayItem(COLORS),

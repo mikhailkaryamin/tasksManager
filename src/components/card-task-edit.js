@@ -49,9 +49,9 @@ const createRepeatingDaysMarkup = (days, repeatingDays) => {
 
 const createCardTaskEditTemplate = (task) => {
   const {
+    color,
     description,
     dueDate,
-    color,
     repeatingDays,
   } = task;
 

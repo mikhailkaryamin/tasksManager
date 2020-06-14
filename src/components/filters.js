@@ -2,8 +2,8 @@ import AbstractComponent from './abstract-component.js';
 
 const createFilterMarkup = (filter, isChecked) => {
   const {
-    name,
     count,
+    name,
   } = filter;
 
   return (
@@ -36,8 +36,8 @@ const createFiltersTemplate = (filters) => {
 class Filters extends AbstractComponent {
   constructor(filters) {
     super();
-    this._filters = filters;
     this._element = null;
+    this._filters = filters;
   }
 
   getTemplate() {

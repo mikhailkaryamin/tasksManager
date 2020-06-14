@@ -1,3 +1,10 @@
+const createElement = (template) => {
+  const newElement = document.createElement(`div`);
+  newElement.innerHTML = template;
+
+  return newElement.firstChild;
+};
+
 const NodePosition = {
   APPEND: `append`,
   PREPEND: `prepend`,
@@ -19,13 +26,6 @@ const removeElement = (component) => {
   component.removeElement();
 };
 
-const createElement = (template) => {
-  const newElement = document.createElement(`div`);
-  newElement.innerHTML = template;
-
-  return newElement.firstChild;
-};
-
 const replaceElement = (newComponent, oldComponent) => {
   const parentElement = oldComponent.getElement().parentElement;
   const newElement = newComponent.getElement();
@@ -38,7 +38,6 @@ const replaceElement = (newComponent, oldComponent) => {
   }
 
 };
-
 
 export {
   createElement,

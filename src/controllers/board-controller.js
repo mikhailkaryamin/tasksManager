@@ -2,10 +2,9 @@ import BoardComponent from '../components/board.js';
 import CardTaskComponent from '../components/card-task.js';
 import CardTaskEditComponent from '../components/card-task-edit.js';
 import LoadMoreButtonComponent from '../components/load-more-button.js';
+import NoTasks from '../components/no-tasks.js';
 import SortComponent from '../components/sort.js';
 import TasksListComponent from '../components/tasks-list.js';
-import NoTasks from '../components/no-tasks.js';
-
 import {generateTasks} from '../mock/task.js';
 import {
   render,
@@ -14,10 +13,11 @@ import {
 } from '../utils/render.js';
 import {onEscKeyDown} from '../utils/common.js';
 import {
-  Sing,
   SHOWING_TASKS_COUNT,
+  SortType,
   TASK_COUNT,
 } from '../const.js';
+
 
 class BoardController {
   constructor(container) {
@@ -25,15 +25,61 @@ class BoardController {
     this._tasks = generateTasks(TASK_COUNT);
     this._boardComponent = new BoardComponent();
     this._boardEl = this._boardComponent.getElement();
-    this._sortComponent = new SortComponent();
-    this._noTasksComponent = new NoTasks();
-    this._tasksListComponent = new TasksListComponent();
     this._loadMoreButtonComponent = new LoadMoreButtonComponent();
+    this._noTasksComponent = new NoTasks();
+    this._sortComponent = new SortComponent();
+    this._sortedTasks = this._tasks.slice();
+    this._tasksListComponent = new TasksListComponent();
+    this._tasksListEl = this._tasksListComponent.getElement();
     this._startTaskRender = 1;
     this._endTaskRender = this._startTaskRender + SHOWING_TASKS_COUNT;
   }
 
-  _renderTask(tasksListEl, task) {
+  render() {
+    render(this._container, this._boardComponent);
+
+    if (this._tasks.length === 0) {
+      render(this._boardEl, this._noTasksComponent.getElement());
+      return;
+    }
+
+    render(this._boardEl, this._sortComponent);
+    render(this._boardEl, this._tasksListComponent);
+
+    this._renderTasksList();
+
+    this._sortComponent.setSortTypeChangeHandler((sortType) => {
+      this._getSortedTasks(sortType);
+      this._resetBoard();
+      this._renderTasksList();
+    });
+  }
+
+  _controlLoadMoreButton() {
+    if (this._tasks.length > this._endTaskRender) {
+      render(this._boardEl, this._loadMoreButtonComponent);
+      this._loadMoreButtonComponent.setLoadMoreButtonHandler(this._renderTasksList.bind(this));
+    }
+
+    if (this._showingTasksCount !== 1 && this._tasks.length < this._endTaskRender) {
+      removeElement(this._loadMoreButtonComponent);
+    }
+  }
+
+  _getSortedTasks(sortType) {
+    switch (sortType) {
+      case SortType.DATE_UP:
+        this._sortedTasks.sort((a, b) => a.dueDate - b.dueDate);
+        break;
+      case SortType.DATE_DOWN:
+        this._sortedTasks.sort((a, b) => b.dueDate - a.dueDate);
+        break;
+      case SortType.DEFAULT:
+        this._sortedTasks = this._tasks.slice();
+    }
+  }
+
+  _renderTask(task) {
     const cardTask = new CardTaskComponent(task);
     const cardTaskEdit = new CardTaskEditComponent(task);
 
@@ -60,57 +106,24 @@ class BoardController {
       document.addEventListener(`keydown`, onCloseEdit);
     });
 
-    render(tasksListEl, cardTask);
+    render(this._tasksListEl, cardTask);
   }
 
   _renderTasksList() {
-    const tasksForRender = this._tasks.slice(this._startTaskRender, this._endTaskRender);
-    const tasksListEl = this._tasksListComponent.getElement();
+    const tasksForRender = this._sortedTasks.slice(this._startTaskRender, this._endTaskRender);
 
-    tasksForRender.forEach((task) => this._renderTask(tasksListEl, task));
+    tasksForRender.forEach((task) => this._renderTask(task));
 
-    if (this._showingTasksCount !== 1 && this._tasks.length < this._endTaskRender) {
-      this._controlLoadMoreButton(Sing.REMOVE);
-    }
+    this._controlLoadMoreButton();
 
     this._startTaskRender += SHOWING_TASKS_COUNT;
     this._endTaskRender += SHOWING_TASKS_COUNT;
   }
 
-  _controlLoadMoreButton(sing) {
-
-    if (sing === Sing.RENDER) {
-      render(this._boardEl, this._loadMoreButtonComponent);
-      this._loadMoreButtonComponent.setLoadMoreButtonHandler(this._renderTasksList.bind(this));
-    }
-
-    if (sing === Sing.REMOVE) {
-      removeElement(this._loadMoreButtonComponent);
-    }
-  }
-
-  _renderBoard() {
-
-
-    render(this._container, this._boardComponent);
-
-    if (this._tasks.length === 0) {
-      render(this._boardEl, this._noTasksComponent.getElement());
-      return;
-    }
-
-    render(this._boardEl, this._sortComponent);
-    render(this._boardEl, this._tasksListComponent);
-
-    this._renderTasksList();
-
-    if (this._tasks.length > this._endTaskRender) {
-      this._controlLoadMoreButton(Sing.RENDER);
-    }
-  }
-
-  render() {
-    return this._renderBoard();
+  _resetBoard() {
+    this._tasksListEl.innerHTML = ``;
+    this._startTaskRender = 1;
+    this._endTaskRender = this._startTaskRender + SHOWING_TASKS_COUNT;
   }
 }
 
