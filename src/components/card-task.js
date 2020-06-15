@@ -85,6 +85,14 @@ class CardTask extends AbstractComponent {
   setEditButtonHandler(cb) {
     this.getElement().querySelector(`.card__btn--edit`).addEventListener(`click`, cb);
   }
+
+  setFavoriteButtonHandler(cb) {
+    this.getElement().querySelector(`.card__btn--favorites`).addEventListener(`click`, cb);
+  }
+
+  setArchiveButtonHandler(cb) {
+    this.getElement().querySelector(`.card__btn--archive`).addEventListener(`click`, cb);
+  }
 }
 
 export default CardTask;

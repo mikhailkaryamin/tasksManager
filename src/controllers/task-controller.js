@@ -7,38 +7,51 @@ import {
 import {onEscKeyDown} from '../utils/common.js';
 
 class TaskController {
-  constructor(container) {
+  constructor(container, onDataChange) {
+    this.onDataChange = onDataChange;
     this._container = container;
+    this._cardTask = null;
+    this._cardTaskEdit = null;
   }
 
   render(task) {
-    const cardTask = new CardTaskComponent(task);
-    const cardTaskEdit = new CardTaskEditComponent(task);
+    this._cardTask = new CardTaskComponent(task);
+    this._cardTaskEdit = new CardTaskEditComponent(task);
 
     const onCloseEdit = (evt) => {
       onEscKeyDown(evt, replaceEditToTask);
     };
 
     const replaceTaskToEdit = () => {
-      replaceElement(cardTaskEdit, cardTask);
+      replaceElement(this._cardTaskEdit, this._cardTask);
     };
 
     const replaceEditToTask = () => {
-      replaceElement(cardTask, cardTaskEdit);
+      replaceElement(this._cardTask, this._cardTaskEdit);
     };
 
-    cardTaskEdit.setSubmitHandler((evt) => {
+    this._cardTaskEdit.setSubmitHandler((evt) => {
       evt.preventDefault();
       replaceEditToTask();
       document.removeEventListener(`keydown`, onCloseEdit);
     });
 
-    cardTask.setEditButtonHandler(() => {
+    this._cardTask.setEditButtonHandler(() => {
       replaceTaskToEdit();
       document.addEventListener(`keydown`, onCloseEdit);
     });
 
-    render(this._container, cardTask);
+    this._cardTask.setFavoriteButtonHandler(() => {
+      task.isFavorite = !task.isFavorite;
+      this.onDataChange();
+    });
+
+    this._cardTask.setArchiveButtonHandler(() => {
+      task.isArchive = !task.isArchive;
+      this.onDataChange();
+    });
+
+    render(this._container, this._cardTask);
   }
 }
 
