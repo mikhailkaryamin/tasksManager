@@ -1,41 +1,39 @@
 import BoardComponent from '../components/board.js';
-import CardTaskComponent from '../components/card-task.js';
-import CardTaskEditComponent from '../components/card-task-edit.js';
 import LoadMoreButtonComponent from '../components/load-more-button.js';
 import NoTasks from '../components/no-tasks.js';
 import SortComponent from '../components/sort.js';
 import TasksListComponent from '../components/tasks-list.js';
-import {generateTasks} from '../mock/task.js';
+import TaskController from './task-controller.js';
 import {
   render,
-  replaceElement,
   removeElement,
 } from '../utils/render.js';
-import {onEscKeyDown} from '../utils/common.js';
 import {
   SHOWING_TASKS_COUNT,
   SortType,
-  TASK_COUNT,
 } from '../const.js';
 
 
 class BoardController {
   constructor(container) {
     this._container = container;
-    this._tasks = generateTasks(TASK_COUNT);
+    this._tasks = [];
+    this._sortedTasks = [];
     this._boardComponent = new BoardComponent();
     this._boardEl = this._boardComponent.getElement();
     this._loadMoreButtonComponent = new LoadMoreButtonComponent();
     this._noTasksComponent = new NoTasks();
     this._sortComponent = new SortComponent();
-    this._sortedTasks = this._tasks.slice();
     this._tasksListComponent = new TasksListComponent();
     this._tasksListEl = this._tasksListComponent.getElement();
     this._startTaskRender = 1;
     this._endTaskRender = this._startTaskRender + SHOWING_TASKS_COUNT;
   }
 
-  render() {
+  render(tasks) {
+    this._tasks = tasks.slice();
+    this._sortedTasks = tasks.slice();
+
     render(this._container, this._boardComponent);
 
     if (this._tasks.length === 0) {
@@ -79,40 +77,11 @@ class BoardController {
     }
   }
 
-  _renderTask(task) {
-    const cardTask = new CardTaskComponent(task);
-    const cardTaskEdit = new CardTaskEditComponent(task);
-
-    const onCloseEdit = (evt) => {
-      onEscKeyDown(evt, replaceEditToTask);
-    };
-
-    const replaceTaskToEdit = () => {
-      replaceElement(cardTaskEdit, cardTask);
-    };
-
-    const replaceEditToTask = () => {
-      replaceElement(cardTask, cardTaskEdit);
-    };
-
-    cardTaskEdit.setSubmitHandler((evt) => {
-      evt.preventDefault();
-      replaceEditToTask();
-      document.removeEventListener(`keydown`, onCloseEdit);
-    });
-
-    cardTask.setEditButtonHandler(() => {
-      replaceTaskToEdit();
-      document.addEventListener(`keydown`, onCloseEdit);
-    });
-
-    render(this._tasksListEl, cardTask);
-  }
-
   _renderTasksList() {
+    const taskController = new TaskController(this._tasksListEl);
     const tasksForRender = this._sortedTasks.slice(this._startTaskRender, this._endTaskRender);
 
-    tasksForRender.forEach((task) => this._renderTask(task));
+    tasksForRender.forEach((task) => taskController.render(task));
 
     this._controlLoadMoreButton();
 
