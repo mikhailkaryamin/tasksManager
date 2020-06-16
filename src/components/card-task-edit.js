@@ -1,6 +1,5 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
 import {
-  MONTH_NAMES,
   DAYS,
   COLORS,
 } from "../const.js";

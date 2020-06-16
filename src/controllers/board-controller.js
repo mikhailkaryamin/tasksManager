@@ -19,6 +19,7 @@ class BoardController {
     this._container = container;
     this._defaultTasksList = [];
     this._tasks = [];
+    this._showedTasksController = [];
     this._boardComponent = new BoardComponent();
     this._boardEl = this._boardComponent.getElement();
     this._loadMoreButtonComponent = new LoadMoreButtonComponent();
@@ -27,6 +28,7 @@ class BoardController {
     this._tasksListComponent = new TasksListComponent();
     this._tasksListEl = this._tasksListComponent.getElement();
     this._onDataChange = this._onDataChange.bind(this);
+    this._onViewChange = this._onViewChange.bind(this);
     this._onSortTypeChange = this._onSortTypeChange.bind(this);
     this._showingTasksCount = SHOWING_TASKS_COUNT;
   }
@@ -99,13 +101,18 @@ class BoardController {
     this._renderTasksList();
   }
 
+  _onViewChange() {
+    this._showedTasksController.forEach((taskController) => taskController.setDefaultView());
+  }
+
   _renderTasksList() {
     const tasksForRender = this._tasks.slice(0, this._showingTasksCount);
 
     this._resetBoard();
 
     tasksForRender.forEach((task) => {
-      const taskController = new TaskController(this._tasksListEl, this._onDataChange);
+      const taskController = new TaskController(this._tasksListEl, this._onDataChange, this._onViewChange);
+      this._showedTasksController.push(taskController);
       taskController.render(task);
     });
 
@@ -114,6 +121,7 @@ class BoardController {
 
   _resetBoard() {
     this._tasksListEl.innerHTML = ``;
+    this._showedTasksController.length = 0;
   }
 
   _resetCount() {
