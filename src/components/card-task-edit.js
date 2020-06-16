@@ -1,4 +1,6 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
+import flatpickr from "flatpickr";
+import "flatpickr/dist/themes/light.css";
 import {
   DAYS,
   COLORS,
@@ -50,11 +52,13 @@ class CardTaskEdit extends AbstractSmartComponent {
     super();
     this._task = task;
     this._submitHandler = null;
+    this._flatpickr = null;
     this._repeatingDays = this._task.repeatingDays;
     this._isRepeatingTask = Object.values(this._repeatingDays).some(Boolean);
     this._color = this._task.color;
-    this._isDateShowing = !!this._task.dueDate;
+    this._isDateShowing = !!task.dueDate;
     this._subscribeOnEvents();
+    this._applyFlatpickr();
   }
 
   getTemplate() {
@@ -68,6 +72,7 @@ class CardTaskEdit extends AbstractSmartComponent {
 
   rerender() {
     super.rerender();
+    this._applyFlatpickr();
   }
 
   setSubmitHandler(cb) {
@@ -94,8 +99,9 @@ class CardTaskEdit extends AbstractSmartComponent {
       minute: `numeric`,
     };
 
-    const date = this._isDateShowing ? `${dueDate.toLocaleString(`en-GB`, formatDate)}` : ``;
-    const time = this._isDateShowing ? `${dueDate.toLocaleString(`en-GB`, formatTime)}` : ``;
+    const isExistDueDate = !!dueDate;
+    const date = isExistDueDate ? `${dueDate.toLocaleString(`en-GB`, formatDate)}` : ``;
+    const time = isExistDueDate ? `${dueDate.toLocaleString(`en-GB`, formatTime)}` : ``;
 
     const repeatClass = this._isRepeatingTask ? `card--repeat` : ``;
     const deadlineClass = isExpired ? `card--deadline` : ``;
@@ -192,16 +198,36 @@ class CardTaskEdit extends AbstractSmartComponent {
       this.rerender();
     });
 
+
     dateButtonEl.addEventListener(`click`, () => {
       this._isDateShowing = !this._isDateShowing;
 
       this.rerender();
+
     });
 
     colorButtonsEl.addEventListener(`change`, (evt) => {
       this._color = evt.target.value;
       this.rerender();
     });
+  }
+
+  _applyFlatpickr() {
+    if (this._flatpickr) {
+      this._flatpickr.destroy();
+      this._flatpickr = null;
+    }
+
+    if (this._isDateShowing) {
+      const taskEditEl = this.getElement();
+      const dateInputEl = taskEditEl.querySelector(`.card__date`);
+
+      this._flatpickr = flatpickr(dateInputEl, {
+        altInput: true,
+        allowInput: true,
+        defaultDate: this._task.dueDate || `today`,
+      });
+    }
   }
 }
 
