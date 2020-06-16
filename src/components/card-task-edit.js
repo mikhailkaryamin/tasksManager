@@ -108,7 +108,7 @@ class CardTaskEdit extends AbstractSmartComponent {
 
     const colorsMarkup = createColorMarkup(COLORS, this._color);
     const repeatingDaysMarkup = createRepeatingDaysMarkup(DAYS, this._repeatingDays);
-    // console.log(darkTheme)
+
     return (
       `<article class="card card--edit card--${this._color} ${repeatClass} ${deadlineClass}">
         <form class="card__form" method="get">
@@ -190,9 +190,7 @@ class CardTaskEdit extends AbstractSmartComponent {
   _subscribeOnEvents() {
     const taskEditEl = this.getElement();
     const repeatButtonEl = taskEditEl.querySelector(`.card__repeat-toggle`);
-
     const dateButtonEl = taskEditEl.querySelector(`.card__date-deadline-toggle`);
-
     const colorButtonsEl = taskEditEl.querySelector(`.card__colors-inner`);
 
     repeatButtonEl.addEventListener(`click`, () => {
