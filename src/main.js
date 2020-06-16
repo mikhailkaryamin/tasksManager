@@ -3,8 +3,11 @@ import FiltersComponent from './components/filters.js';
 import MenuComponent from './components/menu.js';
 import {generateFilters} from './mock/filter.js';
 import {render} from './utils/render.js';
+import {generateTasks} from './mock/task.js';
+import {TASK_COUNT} from './const.js';
 
 const filters = generateFilters();
+const tasks = generateTasks(TASK_COUNT);
 
 const menuComponent = new MenuComponent();
 const filtersComponent = new FiltersComponent(filters);
@@ -16,4 +19,4 @@ const mainControlEl = mainEl.querySelector(`.main__control`);
 render(mainControlEl, menuComponent);
 render(mainEl, filtersComponent);
 
-boardController.render();
+boardController.render(tasks);

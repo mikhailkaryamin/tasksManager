@@ -1,6 +1,4 @@
 import AbstractComponent from './abstract-component.js';
-import {MONTH_NAMES} from "../const.js";
-import {formatTime} from '../utils/common.js';
 
 const createCardTaskTemplate = (task) => {
   const {
@@ -15,8 +13,18 @@ const createCardTaskTemplate = (task) => {
   const isExpired = dueDate instanceof Date && dueDate < Date.now();
   const isDateShowing = !!dueDate;
 
-  const date = isDateShowing ? `${dueDate.getDate()} ${MONTH_NAMES[dueDate.getMonth()]}` : ``;
-  const time = isDateShowing ? formatTime(dueDate) : ``;
+  const formatDate = {
+    day: `numeric`,
+    month: `long`,
+  };
+
+  const formatTime = {
+    hour: `numeric`,
+    minute: `numeric`,
+  };
+
+  const date = isDateShowing ? `${dueDate.toLocaleString(`en-GB`, formatDate)}` : ``;
+  const time = isDateShowing ? `${dueDate.toLocaleString(`en-GB`, formatTime)}` : ``;
 
   const repeatClass = Object.values(repeatingDays).some(Boolean) ? `card--repeat` : ``;
   const deadlineClass = isExpired ? `card--deadline` : ``;
@@ -84,6 +92,14 @@ class CardTask extends AbstractComponent {
 
   setEditButtonHandler(cb) {
     this.getElement().querySelector(`.card__btn--edit`).addEventListener(`click`, cb);
+  }
+
+  setFavoriteButtonHandler(cb) {
+    this.getElement().querySelector(`.card__btn--favorites`).addEventListener(`click`, cb);
+  }
+
+  setArchiveButtonHandler(cb) {
+    this.getElement().querySelector(`.card__btn--archive`).addEventListener(`click`, cb);
   }
 }
 
