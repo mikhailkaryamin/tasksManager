@@ -16,6 +16,9 @@ class TaskController {
   }
 
   render(task) {
+    const oldCardTaskComponent = this._cardTask;
+    const oldCardTaskEditComponent = this._cardTaskEdit;
+
     this._cardTask = new CardTaskComponent(task);
     this._cardTaskEdit = new CardTaskEditComponent(task);
 
@@ -44,19 +47,28 @@ class TaskController {
     });
 
     this._cardTask.setFavoriteButtonHandler(() => {
-      const newTask = Object.assign({}, task, {
+      const newData = Object.assign({}, task, {
         isFavorite: !task.isFavorite,
       });
 
-      this._onDataChange(this, task, newTask);
+      this._onDataChange(this, task, newData);
     });
 
     this._cardTask.setArchiveButtonHandler(() => {
-      task.isArchive = !task.isArchive;
-      this._onDataChange();
+      const newData = Object.assign({}, task, {
+        isArchive: !task.isArchive,
+      });
+
+      this._onDataChange(this, task, newData);
     });
 
-    render(this._container, this._cardTask);
+    if (oldCardTaskComponent && oldCardTaskEditComponent) {
+      replaceElement(this._cardTask, oldCardTaskComponent);
+      replaceElement(this._cardTaskEdit, oldCardTaskEditComponent);
+    } else {
+      render(this._container, this._cardTask);
+    }
+
   }
 
   setDefaultView() {
