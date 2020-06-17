@@ -22,7 +22,4 @@ module.exports = {
     path: path.resolve(__dirname, 'public'),
     filename: 'bundle.js'
   },
-  plugins: [
-    new MomentLocalesPlugin()
-  ]
 };
