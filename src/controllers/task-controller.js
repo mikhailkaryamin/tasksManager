@@ -44,8 +44,11 @@ class TaskController {
     });
 
     this._cardTask.setFavoriteButtonHandler(() => {
-      task.isFavorite = !task.isFavorite;
-      this._onDataChange();
+      const newTask = Object.assign({}, task, {
+        isFavorite: !task.isFavorite,
+      });
+
+      this._onDataChange(this, task, newTask);
     });
 
     this._cardTask.setArchiveButtonHandler(() => {

@@ -17,7 +17,6 @@ import {
 class BoardController {
   constructor(container) {
     this._container = container;
-    this._defaultTasksList = [];
     this._tasks = [];
     this._showedTasksController = [];
     this._boardComponent = new BoardComponent();
@@ -34,8 +33,7 @@ class BoardController {
   }
 
   render(tasks) {
-    this._defaultTasksList = tasks;
-    this._tasks = tasks.slice();
+    this._tasks = tasks;
 
     render(this._container, this._boardComponent);
 
@@ -49,7 +47,7 @@ class BoardController {
     render(this._boardEl, this._sortComponent);
     render(this._boardEl, this._tasksListComponent);
 
-    this._renderTasksList();
+    this._renderTasksList(this._tasks);
 
     this._sortComponent.setSortTypeChangeHandler(this._onSortTypeChange);
   }
@@ -66,47 +64,56 @@ class BoardController {
 
     const isExistLoadMoreButton = this._boardEl.contains(this._loadMoreButtonComponent.getElement());
 
-    if (this._defaultTasksList.length > this._showingTasksCount && !isExistLoadMoreButton) {
+    if (this._tasks.length > this._showingTasksCount && !isExistLoadMoreButton) {
       render(this._boardEl, this._loadMoreButtonComponent);
       this._loadMoreButtonComponent.setLoadMoreButtonHandler(loadMoreClickHandler);
     }
 
-    if (isExistLoadMoreButton && this._defaultTasksList.length < this._showingTasksCount) {
+    if (isExistLoadMoreButton && this._tasks.length < this._showingTasksCount) {
       removeElement(this._loadMoreButtonComponent);
     }
   }
 
   _getSortedTasks(sortType) {
+    let sortedTasks = [];
+
     switch (sortType) {
       case SortType.DATE_UP:
-        this._tasks.sort((a, b) => a.dueDate - b.dueDate);
+        sortedTasks = this._tasks.slice().sort((a, b) => a.dueDate - b.dueDate);
         break;
       case SortType.DATE_DOWN:
-        this._tasks.sort((a, b) => b.dueDate - a.dueDate);
+        sortedTasks = this._tasks.slice().sort((a, b) => b.dueDate - a.dueDate);
         break;
       case SortType.DEFAULT:
-        this._tasks = this._defaultTasksList.slice();
+        sortedTasks = this._tasks;
     }
+
+    return sortedTasks;
   }
 
-  _onDataChange() {
-    this._resetBoard();
-    this._renderTasksList();
+  _onDataChange(taskController, oldData, newData) {
+    const indexData = this._tasks.findIndex((data) => data === oldData);
+    if (indexData === -1) {
+      return;
+    }
+
+    this._tasks = [].concat(this._tasks.slice(0, indexData), newData, this._tasks.slice(indexData + 1));
+    taskController.render(this._tasks[indexData]);
   }
 
   _onSortTypeChange(sortType) {
-    this._getSortedTasks(sortType);
+    const sortedTasks = this._getSortedTasks(sortType);
     this._resetBoard();
     this._resetCount();
-    this._renderTasksList();
+    this._renderTasksList(sortedTasks);
   }
 
   _onViewChange() {
     this._showedTasksController.forEach((taskController) => taskController.setDefaultView());
   }
 
-  _renderTasksList() {
-    const tasksForRender = this._tasks.slice(0, this._showingTasksCount);
+  _renderTasksList(tasks) {
+    const tasksForRender = tasks.slice(0, this._showingTasksCount);
 
     this._resetBoard();
 
