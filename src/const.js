@@ -1,5 +1,13 @@
 const DAYS = [`mo`, `tu`, `we`, `th`, `fr`, `sa`, `su`];
-const COLORS = [`black`, `yellow`, `blue`, `green`, `pink`];
+const Color = {
+  BLACK: `black`,
+  YELLOW: `yellow`,
+  BLUE: `blue`,
+  GREEN: `green`,
+  PINK: `pink`,
+};
+
+const COLORS = Object.values(Color);
 const DESCRIPTION_ITEMS = [
   `Est tempor sint est nostrud nostrud exercitation.`,
   `Exercitation consequat elit irure eu magna proident commodo.`,
@@ -23,6 +31,7 @@ const FilterType = {
 const SHOWING_TASKS_COUNT = 8;
 
 export {
+  Color,
   COLORS,
   DAYS,
   DESCRIPTION_ITEMS,

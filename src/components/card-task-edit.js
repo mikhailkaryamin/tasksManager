@@ -56,6 +56,7 @@ class CardTaskEdit extends AbstractSmartComponent {
     super();
     this._task = task;
     this._submitHandler = null;
+    this._deleteButtonHandler = null;
     this._flatpickr = null;
     this._color = this._task.color;
     this._isDateShowing = !!task.dueDate;
@@ -69,6 +70,7 @@ class CardTaskEdit extends AbstractSmartComponent {
 
   recoveryListeners() {
     this.setSubmitHandler(this._submitHandler);
+    this.setDeleteButtonHandler(this._deleteButtonHandler);
     this._subscribeOnEvents();
   }
 
@@ -81,6 +83,11 @@ class CardTaskEdit extends AbstractSmartComponent {
     this.getElement().querySelector(`.card__save`).addEventListener(`click`, cb);
 
     this._submitHandler = cb;
+  }
+
+  setDeleteButtonHandler(cb) {
+    this.getElement().querySelector(`.card__delete`).addEventListener(`click`, cb);
+    this._deleteButtonHandler = cb;
   }
 
   _getCardTaskEditTemplate() {

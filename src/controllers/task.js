@@ -64,6 +64,10 @@ class TaskController {
       document.addEventListener(`keydown`, this._onCloseEdit);
     });
 
+    this._cardTaskEdit.setDeleteButtonHandler(() => {
+      this._onDataChange(this, task, null);
+    });
+
     this._cardTask.setFavoriteButtonHandler(() => {
       const newData = Object.assign({}, task, {
         isFavorite: !task.isFavorite,

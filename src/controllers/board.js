@@ -32,6 +32,7 @@ class BoardController {
     this._onFilterChange = this._onFilterChange.bind(this);
     this._onLoadMoreButton = this._onLoadMoreButton.bind(this);
     this._showingTasksCount = SHOWING_TASKS_COUNT;
+    this._sortType = SortType.DEFAULT;
 
     this._sortComponent.setSortTypeChangeHandler(this._onSortTypeChange);
     this._tasksModel.setFilterChangeHandler(this._onFilterChange);
@@ -57,11 +58,11 @@ class BoardController {
     this._showingTasksCount += SHOWING_TASKS_COUNT;
   }
 
-  _getSortedTasks(sortType) {
+  _getSortedTasks() {
     const tasks = this._tasksModel.getTasks();
     let sortedTasks = [];
 
-    switch (sortType) {
+    switch (this._sortType) {
       case SortType.DATE_UP:
         sortedTasks = tasks.slice().sort((a, b) => a.dueDate - b.dueDate);
         break;
@@ -76,6 +77,13 @@ class BoardController {
   }
 
   _onDataChange(taskController, oldData, newData) {
+    if (newData === null) {
+      this._tasksModel.removeTask(oldData.id);
+      const tasks = this._getSortedTasks();
+      this._renderTasksList(tasks);
+      return;
+    }
+
     const isSuccess = this._tasksModel.updateTask(oldData.id, newData);
 
     if (isSuccess) {
@@ -84,10 +92,12 @@ class BoardController {
   }
 
   _onSortTypeChange(sortType) {
-    const sortedTasks = this._getSortedTasks(sortType);
+    this._sortType = sortType;
+
+    const tasks = this._getSortedTasks();
     this._removeTasks();
     this._resetCount();
-    this._renderTasksList(sortedTasks);
+    this._renderTasksList(tasks);
   }
 
   _onViewChange() {
