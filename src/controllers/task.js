@@ -15,6 +15,7 @@ class TaskController {
     this._cardTask = null;
     this._cardTaskEdit = null;
     this._onCloseEdit = this._onCloseEdit.bind(this);
+    this._subscribeOnEvents = this._subscribeOnEvents.bind(this);
   }
 
   render(task) {
@@ -24,6 +25,34 @@ class TaskController {
     this._cardTask = new CardTaskComponent(task);
     this._cardTaskEdit = new CardTaskEditComponent(task);
 
+    this._subscribeOnEvents(task);
+
+    if (oldCardTaskComponent && oldCardTaskEditComponent) {
+      replaceElement(this._cardTask, oldCardTaskComponent);
+      replaceElement(this._cardTaskEdit, oldCardTaskEditComponent);
+    } else {
+      render(this._container, this._cardTask);
+    }
+  }
+
+  destroy() {
+    removeElement(this._cardTask);
+    removeElement(this._cardTaskEdit);
+    document.removeEventListener(`keydown`, this._onCloseEdit);
+  }
+
+  setDefaultView() {
+    const cardTaskEl = this._cardTask.getElement();
+    const isCloseTaskEdit = cardTaskEl.parentElement;
+
+    if (isCloseTaskEdit) {
+      return;
+    }
+
+    replaceElement(this._cardTask, this._cardTaskEdit);
+  }
+
+  _subscribeOnEvents(task) {
     this._cardTaskEdit.setSubmitHandler((evt) => {
       evt.preventDefault();
       this._replaceEditToTask();
@@ -50,31 +79,6 @@ class TaskController {
 
       this._onDataChange(this, task, newData);
     });
-
-    if (oldCardTaskComponent && oldCardTaskEditComponent) {
-      replaceElement(this._cardTask, oldCardTaskComponent);
-      replaceElement(this._cardTaskEdit, oldCardTaskEditComponent);
-    } else {
-      render(this._container, this._cardTask);
-    }
-
-  }
-
-  destroy() {
-    removeElement(this._cardTask);
-    removeElement(this._cardTaskEdit);
-    document.removeEventListener(`keydown`, this._onCloseEdit);
-  }
-
-  setDefaultView() {
-    const cardTaskEl = this._cardTask.getElement();
-    const isCloseTaskEdit = cardTaskEl.parentElement;
-
-    if (isCloseTaskEdit) {
-      return;
-    }
-
-    replaceElement(this._cardTask, this._cardTaskEdit);
   }
 
   _onCloseEdit(evt) {

@@ -5,6 +5,10 @@ import {
   DAYS,
   COLORS,
 } from "../const.js";
+import {
+  isOverdue,
+  isRepeating,
+} from '../utils/common.js';
 
 const createColorMarkup = (colors, currentColor) => {
   return colors
@@ -53,8 +57,6 @@ class CardTaskEdit extends AbstractSmartComponent {
     this._task = task;
     this._submitHandler = null;
     this._flatpickr = null;
-    this._repeatingDays = this._task.repeatingDays;
-    this._isRepeatingTask = Object.values(this._repeatingDays).some(Boolean);
     this._color = this._task.color;
     this._isDateShowing = !!task.dueDate;
     this._subscribeOnEvents();
@@ -85,9 +87,8 @@ class CardTaskEdit extends AbstractSmartComponent {
     const {
       description,
       dueDate,
+      repeatingDays,
     } = this._task;
-
-    const isExpired = dueDate instanceof Date && dueDate < Date.now();
 
     const formatDate = {
       day: `numeric`,
@@ -99,15 +100,16 @@ class CardTaskEdit extends AbstractSmartComponent {
       minute: `numeric`,
     };
 
-    const isExistDueDate = !!dueDate;
-    const date = isExistDueDate ? `${dueDate.toLocaleString(`en-GB`, formatDate)}` : ``;
-    const time = isExistDueDate ? `${dueDate.toLocaleString(`en-GB`, formatTime)}` : ``;
+    const isDateShowing = !!dueDate;
+    const date = isDateShowing ? `${dueDate.toLocaleString(`en-GB`, formatDate)}` : ``;
+    const time = isDateShowing ? `${dueDate.toLocaleString(`en-GB`, formatTime)}` : ``;
 
-    const repeatClass = this._isRepeatingTask ? `card--repeat` : ``;
-    const deadlineClass = isExpired ? `card--deadline` : ``;
+    const isRepeatingTask = isRepeating(repeatingDays);
+    const repeatClass = isRepeatingTask ? `card--repeat` : ``;
+    const deadlineClass = isOverdue(dueDate) ? `card--deadline` : ``;
 
     const colorsMarkup = createColorMarkup(COLORS, this._color);
-    const repeatingDaysMarkup = createRepeatingDaysMarkup(DAYS, this._repeatingDays);
+    const repeatingDaysMarkup = createRepeatingDaysMarkup(DAYS, repeatingDays);
 
     return (
       `<article class="card card--edit card--${this._color} ${repeatClass} ${deadlineClass}">
@@ -151,11 +153,11 @@ class CardTaskEdit extends AbstractSmartComponent {
         : ``
       }
                   <button class="card__repeat-toggle" type="button">
-                    repeat:<span class="card__repeat-status">${this._isRepeatingTask ? `yes` : `no`}</span>
+                    repeat:<span class="card__repeat-status">${isRepeatingTask ? `yes` : `no`}</span>
                   </button>
   
                   ${
-      this._isRepeatingTask ?
+      isRepeatingTask ?
         `<fieldset class="card__repeat-days">
               <div class="card__repeat-days-inner">
                 ${repeatingDaysMarkup}
@@ -194,7 +196,6 @@ class CardTaskEdit extends AbstractSmartComponent {
     const colorButtonsEl = taskEditEl.querySelector(`.card__colors-inner`);
 
     repeatButtonEl.addEventListener(`click`, () => {
-      this._isRepeatingTask = !this._isRepeatingTask;
       this.rerender();
     });
 
