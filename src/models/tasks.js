@@ -1,10 +1,19 @@
+import {FilterType} from '../const.js';
+import {getTasksByFilter} from '../utils/filters.js';
+
 class Tasks {
   constructor() {
     this._tasks = [];
     this._dataChangeHandlers = [];
+    this._filterChangeHandlers = [];
+    this._activeFilterType = FilterType.ALL;
   }
 
   getTasks() {
+    return getTasksByFilter(this._activeFilterType, this._tasks);
+  }
+
+  getAllTasks() {
     return this._tasks;
   }
 
@@ -28,6 +37,15 @@ class Tasks {
 
   setDataChangeHandler(handler) {
     this._dataChangeHandlers.push(handler);
+  }
+
+  setFilterChangeHandler(handler) {
+    this._filterChangeHandlers.push(handler);
+  }
+
+  setActiveFilter(filterType) {
+    this._activeFilterType = filterType;
+    this._callHandlers(this._filterChangeHandlers);
   }
 
   _callHandlers(handlers) {
