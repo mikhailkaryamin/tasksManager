@@ -1,4 +1,14 @@
 import AbstractComponent from './abstract-component.js';
+import {
+  isOverdue,
+  isRepeating,
+} from '../utils/common.js';
+
+const TypeButton = {
+  EDIT: `edit`,
+  ARCHIVE: `archive`,
+  FAVORITES: `favorites`
+};
 
 const createCardTaskTemplate = (task) => {
   const {
@@ -10,7 +20,6 @@ const createCardTaskTemplate = (task) => {
     isFavorite,
   } = task;
 
-  const isExpired = dueDate instanceof Date && dueDate < Date.now();
   const isDateShowing = !!dueDate;
 
   const formatDate = {
@@ -26,29 +35,25 @@ const createCardTaskTemplate = (task) => {
   const date = isDateShowing ? `${dueDate.toLocaleString(`en-GB`, formatDate)}` : ``;
   const time = isDateShowing ? `${dueDate.toLocaleString(`en-GB`, formatTime)}` : ``;
 
-  const repeatClass = Object.values(repeatingDays).some(Boolean) ? `card--repeat` : ``;
-  const deadlineClass = isExpired ? `card--deadline` : ``;
+  const repeatClass = isRepeating(repeatingDays) ? `card--repeat` : ``;
+  const deadlineClass = isOverdue(dueDate) ? `card--deadline` : ``;
 
-  const archiveButtonInactiveClass = isArchive ? `` : `card__btn--disabled`;
-  const favoriteButtonInactiveClass = isFavorite ? `` : `card__btn--disabled`;
+  const getControlButton = (typeButton, isActive = true) => {
+    return (
+      `<button type="button" class="card__btn card__btn--${typeButton} ${isActive ? `` : `card__btn--disabled`}">
+        ${typeButton}
+      </button>`
+    );
+  };
 
   return (
     `<article class="card card--${color} ${repeatClass} ${deadlineClass}">
       <div class="card__form">
         <div class="card__inner">
           <div class="card__control">
-            <button type="button" class="card__btn card__btn--edit">
-              edit
-            </button>
-            <button type="button" class="card__btn card__btn--archive ${archiveButtonInactiveClass}">
-              archive
-            </button>
-            <button
-              type="button"
-              class="card__btn card__btn--favorites ${favoriteButtonInactiveClass}"
-            >
-              favorites
-            </button>
+            ${getControlButton(TypeButton.EDIT)}
+            ${getControlButton(TypeButton.ARCHIVE, isArchive)}
+            ${getControlButton(TypeButton.FAVORITES, isFavorite)}
           </div>
 
           <div class="card__color-bar">

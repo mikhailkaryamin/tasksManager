@@ -23,12 +23,34 @@ const onEscKeyDown = (evt, action) => {
 
   if (isEscKey) {
     action();
-    document.removeEventListener(`keydown`, onEscKeyDown);
   }
+};
+
+const isRepeating = (repeatingDays) => {
+  return Object.values(repeatingDays).some(Boolean);
+};
+
+const isToday = (date) => {
+  if (date) {
+    const currentDate = new Date().toDateString();
+    return date.toDateString() === currentDate;
+  }
+  return false;
+};
+
+const isOverdue = (dueDate) => {
+  if (dueDate) {
+    return dueDate < Date.now() && !isToday(dueDate);
+  }
+
+  return false;
 };
 
 export {
   getRandomArrayItem,
   getRandomDate,
+  isRepeating,
+  isOverdue,
+  isToday,
   onEscKeyDown,
 };

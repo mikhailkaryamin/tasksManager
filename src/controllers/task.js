@@ -3,6 +3,7 @@ import CardTaskEditComponent from '../components/card-task-edit.js';
 import {
   replaceElement,
   render,
+  removeElement,
 } from '../utils/render.js';
 import {onEscKeyDown} from '../utils/common.js';
 
@@ -13,6 +14,8 @@ class TaskController {
     this._container = container;
     this._cardTask = null;
     this._cardTaskEdit = null;
+    this._onCloseEdit = this._onCloseEdit.bind(this);
+    this._subscribeOnEvents = this._subscribeOnEvents.bind(this);
   }
 
   render(task) {
@@ -22,28 +25,47 @@ class TaskController {
     this._cardTask = new CardTaskComponent(task);
     this._cardTaskEdit = new CardTaskEditComponent(task);
 
-    const onCloseEdit = (evt) => {
-      onEscKeyDown(evt, replaceEditToTask);
-    };
+    this._subscribeOnEvents(task);
 
-    const replaceTaskToEdit = () => {
-      this._onViewChange();
-      replaceElement(this._cardTaskEdit, this._cardTask);
-    };
+    if (oldCardTaskComponent && oldCardTaskEditComponent) {
+      replaceElement(this._cardTask, oldCardTaskComponent);
+      replaceElement(this._cardTaskEdit, oldCardTaskEditComponent);
+    } else {
+      render(this._container, this._cardTask);
+    }
+  }
 
-    const replaceEditToTask = () => {
-      replaceElement(this._cardTask, this._cardTaskEdit);
-    };
+  destroy() {
+    removeElement(this._cardTask);
+    removeElement(this._cardTaskEdit);
+    document.removeEventListener(`keydown`, this._onCloseEdit);
+  }
 
+  setDefaultView() {
+    const cardTaskEl = this._cardTask.getElement();
+    const isCloseTaskEdit = cardTaskEl.parentElement;
+
+    if (isCloseTaskEdit) {
+      return;
+    }
+
+    replaceElement(this._cardTask, this._cardTaskEdit);
+  }
+
+  _subscribeOnEvents(task) {
     this._cardTaskEdit.setSubmitHandler((evt) => {
       evt.preventDefault();
-      replaceEditToTask();
-      document.removeEventListener(`keydown`, onCloseEdit);
+      this._replaceEditToTask();
+      document.removeEventListener(`keydown`, this._onCloseEdit);
     });
 
     this._cardTask.setEditButtonHandler(() => {
-      replaceTaskToEdit();
-      document.addEventListener(`keydown`, onCloseEdit);
+      this._replaceTaskToEdit();
+      document.addEventListener(`keydown`, this._onCloseEdit);
+    });
+
+    this._cardTaskEdit.setDeleteButtonHandler(() => {
+      this._onDataChange(this, task, null);
     });
 
     this._cardTask.setFavoriteButtonHandler(() => {
@@ -61,24 +83,19 @@ class TaskController {
 
       this._onDataChange(this, task, newData);
     });
-
-    if (oldCardTaskComponent && oldCardTaskEditComponent) {
-      replaceElement(this._cardTask, oldCardTaskComponent);
-      replaceElement(this._cardTaskEdit, oldCardTaskEditComponent);
-    } else {
-      render(this._container, this._cardTask);
-    }
-
   }
 
-  setDefaultView() {
-    const cardTaskEl = this._cardTask.getElement();
-    const isCloseTaskEdit = cardTaskEl.parentElement;
+  _onCloseEdit(evt) {
+    onEscKeyDown(evt, this._replaceEditToTask.bind(this));
+    document.removeEventListener(`keydown`, this._onCloseEdit);
+  }
 
-    if (isCloseTaskEdit) {
-      return;
-    }
+  _replaceTaskToEdit() {
+    this._onViewChange();
+    replaceElement(this._cardTaskEdit, this._cardTask);
+  }
 
+  _replaceEditToTask() {
     replaceElement(this._cardTask, this._cardTaskEdit);
   }
 }
