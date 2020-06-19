@@ -1,3 +1,5 @@
+import {EscKeyName} from '../const.js';
+
 const getRandomArrayItem = (array) => {
   const randomIndex = getRandomIntegerNumber(0, array.length);
 
@@ -19,7 +21,7 @@ const getRandomIntegerNumber = (min, max) => {
 };
 
 const onEscKeyDown = (evt, action) => {
-  const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
+  const isEscKey = evt.key === EscKeyName.FULL || evt.key === EscKeyName.CUT;
 
   if (isEscKey) {
     action();
@@ -31,6 +33,7 @@ const isRepeating = (repeatingDays) => {
 };
 
 const isToday = (date) => {
+
   if (date) {
     const currentDate = new Date().toDateString();
     return date.toDateString() === currentDate;

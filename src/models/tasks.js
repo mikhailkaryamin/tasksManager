@@ -9,6 +9,11 @@ class Tasks {
     this._activeFilterType = FilterType.ALL;
   }
 
+  addTask(task) {
+    this._tasks = [].concat(task, this._tasks.slice());
+    this._callHandlers(this._dataChangeHandlers);
+  }
+
   getTasks() {
     return getTasksByFilter(this._activeFilterType, this._tasks);
   }
@@ -59,11 +64,6 @@ class Tasks {
     this._callHandlers(this._dataChangeHandlers);
 
     return true;
-  }
-
-  addTask(task) {
-    this._tasks = [].concat(task, this._tasks.slice());
-    this._callHandlers(this._dataChangeHandlers);
   }
 
   _callHandlers(handlers) {

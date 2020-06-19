@@ -4,6 +4,8 @@ import "flatpickr/dist/themes/light.css";
 import {
   DAYS,
   COLORS,
+  MIN_DESCRIPTION_LENGTH,
+  MAX_DESCRIPTION_LENGTH,
 } from "../const.js";
 import {
   isOverdue,
@@ -58,14 +60,30 @@ class CardTaskEdit extends AbstractSmartComponent {
     this._submitHandler = null;
     this._deleteButtonHandler = null;
     this._flatpickr = null;
-    this._color = this._task.color;
     this._isDateShowing = !!task.dueDate;
+    this._color = task.color;
+    this._repeatingDays = Object.assign({}, task.repeatingDays);
+    this._isRepeatingTask = isRepeating(this._repeatingDays);
+    this._description = task.description;
+    this._dueDate = task.dueDate;
     this._subscribeOnEvents();
     this._applyFlatpickr();
+    this._isDisabledSaveButton = this._isDisabledSaveButton.bind(this);
   }
 
   getTemplate() {
     return this._getCardTaskEditTemplate();
+  }
+
+  getData() {
+    const formData = {
+      description: this._description,
+      color: this._color,
+      dueDate: this._dueDate,
+      repeatingDays: Object.assign({}, this._repeatingDays),
+    };
+
+    return formData;
   }
 
   recoveryListeners() {
@@ -77,6 +95,15 @@ class CardTaskEdit extends AbstractSmartComponent {
   rerender() {
     super.rerender();
     this._applyFlatpickr();
+  }
+
+  removeElement() {
+    if (this._flatpickr) {
+      this._flatpickr.destroy();
+      this._flatpickr = null;
+    }
+
+    super.removeElement();
   }
 
   setSubmitHandler(cb) {
@@ -91,12 +118,6 @@ class CardTaskEdit extends AbstractSmartComponent {
   }
 
   _getCardTaskEditTemplate() {
-    const {
-      description,
-      dueDate,
-      repeatingDays,
-    } = this._task;
-
     const formatDate = {
       day: `numeric`,
       month: `long`,
@@ -107,16 +128,14 @@ class CardTaskEdit extends AbstractSmartComponent {
       minute: `numeric`,
     };
 
-    const isDateShowing = !!dueDate;
-    const date = isDateShowing ? `${dueDate.toLocaleString(`en-GB`, formatDate)}` : ``;
-    const time = isDateShowing ? `${dueDate.toLocaleString(`en-GB`, formatTime)}` : ``;
+    const date = this._isDateShowing ? `${this._dueDate.toLocaleString(`en-GB`, formatDate)}` : ``;
+    const time = this._isDateShowing ? `${this._dueDate.toLocaleString(`en-GB`, formatTime)}` : ``;
 
-    const isRepeatingTask = isRepeating(repeatingDays);
-    const repeatClass = isRepeatingTask ? `card--repeat` : ``;
-    const deadlineClass = isOverdue(dueDate) ? `card--deadline` : ``;
+    const repeatClass = this._isRepeatingTask ? `card--repeat` : ``;
+    const deadlineClass = isOverdue(this._dueDate) ? `card--deadline` : ``;
 
     const colorsMarkup = createColorMarkup(COLORS, this._color);
-    const repeatingDaysMarkup = createRepeatingDaysMarkup(DAYS, repeatingDays);
+    const repeatingDaysMarkup = createRepeatingDaysMarkup(DAYS, this._repeatingDays);
 
     return (
       `<article class="card card--edit card--${this._color} ${repeatClass} ${deadlineClass}">
@@ -134,7 +153,7 @@ class CardTaskEdit extends AbstractSmartComponent {
                   class="card__text"
                   placeholder="Start typing your text here..."
                   name="text"
-                >${description}</textarea>
+                >${this._description}</textarea>
               </label>
             </div>
   
@@ -160,11 +179,11 @@ class CardTaskEdit extends AbstractSmartComponent {
         : ``
       }
                   <button class="card__repeat-toggle" type="button">
-                    repeat:<span class="card__repeat-status">${isRepeatingTask ? `yes` : `no`}</span>
+                    repeat:<span class="card__repeat-status">${this._isRepeatingTask ? `yes` : `no`}</span>
                   </button>
   
                   ${
-      isRepeatingTask ?
+      this._isRepeatingTask ?
         `<fieldset class="card__repeat-days">
               <div class="card__repeat-days-inner">
                 ${repeatingDaysMarkup}
@@ -184,7 +203,8 @@ class CardTaskEdit extends AbstractSmartComponent {
             <div class="card__status-btns">
               <button 
                 class="card__save" 
-                type="submit" 
+                type="submit"
+                ${this._isDisabledSaveButton() ? `disabled` : ``}
               >
                 save
               </button>
@@ -197,27 +217,12 @@ class CardTaskEdit extends AbstractSmartComponent {
   }
 
   _subscribeOnEvents() {
-    const taskEditEl = this.getElement();
-    const repeatButtonEl = taskEditEl.querySelector(`.card__repeat-toggle`);
-    const dateButtonEl = taskEditEl.querySelector(`.card__date-deadline-toggle`);
-    const colorButtonsEl = taskEditEl.querySelector(`.card__colors-inner`);
-
-    repeatButtonEl.addEventListener(`click`, () => {
-      this.rerender();
-    });
-
-
-    dateButtonEl.addEventListener(`click`, () => {
-      this._isDateShowing = !this._isDateShowing;
-
-      this.rerender();
-
-    });
-
-    colorButtonsEl.addEventListener(`change`, (evt) => {
-      this._color = evt.target.value;
-      this.rerender();
-    });
+    this._onDateChange();
+    this._onRepeatingDaysChange();
+    this._onRepeatButtonClick();
+    this._onDateButtonClick();
+    this._onColorChange();
+    this._onDescriptionChange();
   }
 
   _applyFlatpickr() {
@@ -234,6 +239,93 @@ class CardTaskEdit extends AbstractSmartComponent {
         altInput: true,
         allowInput: true,
         defaultDate: this._task.dueDate || `today`,
+      });
+    }
+  }
+
+  _isDisabledSaveButton() {
+    const isSuccessDescriptionLength = this._description.length >= MIN_DESCRIPTION_LENGTH && this._description.length <= MAX_DESCRIPTION_LENGTH;
+    const isSuccessDateOrRepeatingTask = this._isDateShowing || isRepeating(this._repeatingDays);
+    if (isSuccessDescriptionLength && isSuccessDateOrRepeatingTask) {
+      return false;
+    }
+
+    return true;
+  }
+
+  _onRepeatButtonClick() {
+    const repeatButtonEl = this.getElement().querySelector(`.card__repeat-toggle`);
+    repeatButtonEl.addEventListener(`click`, () => {
+      this._isRepeatingTask = !this._isRepeatingTask;
+
+      if (this._isRepeatingTask) {
+        this._isDateShowing = false;
+      }
+      this._resetRepeatingDays();
+      this.rerender();
+    });
+  }
+
+  _onDateButtonClick() {
+    const dateButtonEl = this.getElement().querySelector(`.card__date-deadline-toggle`);
+    dateButtonEl.addEventListener(`click`, () => {
+      this._isDateShowing = !this._isDateShowing;
+      if (!this._dueDate && this._isDateShowing) {
+        this._dueDate = new Date();
+      }
+      if (this._isDateShowing) {
+        this._isRepeatingTask = false;
+      } else {
+        this._dueDate = null;
+      }
+
+      this._resetRepeatingDays();
+      this._isDisabledSaveButton();
+      this.rerender();
+    });
+  }
+
+  _onColorChange() {
+    const colorButtonsEl = this.getElement().querySelector(`.card__colors-inner`);
+    colorButtonsEl.addEventListener(`change`, (evt) => {
+      this._color = evt.target.value;
+      this.rerender();
+    });
+  }
+
+  _onDescriptionChange() {
+    const descriptionInputEl = this.getElement().querySelector(`.card__text`);
+    descriptionInputEl.addEventListener(`change`, (evt) => {
+      this._description = evt.target.value;
+      this.rerender();
+    });
+  }
+
+  _onRepeatingDaysChange() {
+    const repeatingDaysEl = this.getElement().querySelector(`.card__repeat-days`);
+    if (repeatingDaysEl) {
+      repeatingDaysEl.addEventListener(`change`, (evt) => {
+        const targetDay = evt.target.value;
+        this._repeatingDays[targetDay] = !this._task.repeatingDays[targetDay];
+        this.rerender();
+      });
+    }
+  }
+
+  _onDateChange() {
+    const dateInputEl = this.getElement().querySelector(`.card__input-deadline-wrap`);
+    if (dateInputEl) {
+      dateInputEl.addEventListener(`change`, (evt) => {
+        this._dueDate = new Date(evt.target.value);
+        this.rerender();
+      });
+    }
+  }
+
+  _resetRepeatingDays() {
+    if (!this._isRepeatingTask) {
+      Object.keys(this._repeatingDays).forEach((key) => {
+        this._repeatingDays[key] = false;
       });
     }
   }

@@ -50,12 +50,23 @@ const NodePosition = {
   APPEND: `append`,
   PREPEND: `prepend`,
 };
+const ModeController = {
+  NEW_TASK: `newTask`,
+  DEFAULT: `default`,
+};
+const MIN_DESCRIPTION_LENGTH = 1;
+const MAX_DESCRIPTION_LENGTH = 140;
+const EscKeyName = {
+  FULL: `Escape`,
+  CUT: `Esc`,
+};
 
 export {
   Color,
   COLORS,
   DAYS,
   DESCRIPTION_ITEMS,
+  EscKeyName,
   FilterType,
   FILTER_ID_PREFIX,
   SHOWING_TASKS_COUNT,
@@ -63,4 +74,7 @@ export {
   TASK_COUNT,
   EMPTY_TASK,
   NodePosition,
+  ModeController,
+  MIN_DESCRIPTION_LENGTH,
+  MAX_DESCRIPTION_LENGTH,
 };

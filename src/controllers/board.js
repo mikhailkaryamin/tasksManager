@@ -9,10 +9,11 @@ import {
   removeElement,
 } from '../utils/render.js';
 import {
+  EMPTY_TASK,
   FilterType,
+  ModeController,
   SHOWING_TASKS_COUNT,
   SortType,
-  EMPTY_TASK
 } from '../const.js';
 
 
@@ -59,7 +60,7 @@ class BoardController {
   addNewTask() {
     this._tasksModel.setActiveFilter(FilterType.ALL);
     this._updateTasks();
-    const taskController = new TaskController(this._tasksListEl, this._onDataChange, this._onViewChange);
+    const taskController = new TaskController(this._tasksListEl, this._onDataChange, this._onViewChange, ModeController.NEW_TASK);
     this._showedTasksController.unshift(taskController);
     taskController.render(EMPTY_TASK);
   }
@@ -94,6 +95,14 @@ class BoardController {
       return;
     }
 
+    if (oldData === EMPTY_TASK) {
+      const newTask = Object.assign({}, EMPTY_TASK, newData);
+      this._tasksModel.addTask(newTask);
+      const tasks = this._getSortedTasks();
+      this._renderTasksList(tasks);
+      return;
+    }
+
     const isSuccess = this._tasksModel.updateTask(oldData.id, newData);
 
     if (isSuccess) {
@@ -119,21 +128,19 @@ class BoardController {
   }
 
   _onLoadMoreButton() {
-    const tasks = this._tasksModel.getTasks();
-
     const loadMoreClickHandler = () => {
       this._setCountRender();
-      this._renderTasksList(tasks);
+      this._renderTasksList(this._tasksModel.getTasks());
     };
 
     const isExistLoadMoreButton = this._boardEl.contains(this._loadMoreButtonComponent.getElement());
 
-    if (tasks.length > this._showingTasksCount && !isExistLoadMoreButton) {
+    if (this._tasksModel.getTasks().length > this._showingTasksCount && !isExistLoadMoreButton) {
       render(this._boardEl, this._loadMoreButtonComponent);
       this._loadMoreButtonComponent.setLoadMoreButtonHandler(loadMoreClickHandler);
     }
 
-    if (isExistLoadMoreButton && tasks.length < this._showingTasksCount) {
+    if (isExistLoadMoreButton && this._tasksModel.getTasks().length < this._showingTasksCount) {
       removeElement(this._loadMoreButtonComponent);
     }
   }
@@ -143,7 +150,7 @@ class BoardController {
     this._removeTasks();
 
     tasksForRender.forEach((task) => {
-      const taskController = new TaskController(this._tasksListEl, this._onDataChange, this._onViewChange);
+      const taskController = new TaskController(this._tasksListEl, this._onDataChange, this._onViewChange, ModeController.DEFAULT);
       this._showedTasksController.push(taskController);
       taskController.render(task);
     });
