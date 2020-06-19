@@ -1,13 +1,10 @@
+import {NodePosition} from '../const.js';
+
 const createElement = (template) => {
   const newElement = document.createElement(`div`);
   newElement.innerHTML = template;
 
   return newElement.firstChild;
-};
-
-const NodePosition = {
-  APPEND: `append`,
-  PREPEND: `prepend`,
 };
 
 const render = (container, component, position = NodePosition.APPEND) => {

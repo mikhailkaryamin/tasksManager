@@ -5,12 +5,18 @@ import {
   render,
   removeElement,
 } from '../utils/render.js';
+import {
+  EscKeyName,
+  ModeController,
+  NodePosition,
+} from '../const.js';
 import {onEscKeyDown} from '../utils/common.js';
 
 class TaskController {
-  constructor(container, onDataChange, onViewChange) {
+  constructor(container, onDataChange, onViewChange, modeController) {
     this._onDataChange = onDataChange;
     this._onViewChange = onViewChange;
+    this._modeController = modeController;
     this._container = container;
     this._cardTask = null;
     this._cardTaskEdit = null;
@@ -26,6 +32,12 @@ class TaskController {
     this._cardTaskEdit = new CardTaskEditComponent(task);
 
     this._subscribeOnEvents(task);
+
+    if (this._modeController === ModeController.NEW_TASK) {
+      render(this._container, this._cardTaskEdit, NodePosition.PREPEND);
+      document.addEventListener(`keydown`, this._onCloseEdit);
+      return;
+    }
 
     if (oldCardTaskComponent && oldCardTaskEditComponent) {
       replaceElement(this._cardTask, oldCardTaskComponent);
@@ -54,7 +66,9 @@ class TaskController {
 
   _subscribeOnEvents(task) {
     this._cardTaskEdit.setSubmitHandler((evt) => {
+      const newData = this._cardTaskEdit.getData();
       evt.preventDefault();
+      this._onDataChange(this, task, newData);
       this._replaceEditToTask();
       document.removeEventListener(`keydown`, this._onCloseEdit);
     });
@@ -86,7 +100,16 @@ class TaskController {
   }
 
   _onCloseEdit(evt) {
-    onEscKeyDown(evt, this._replaceEditToTask.bind(this));
+    if (ModeController.DEFAULT) {
+      onEscKeyDown(evt, this._replaceEditToTask.bind(this));
+    }
+    if (ModeController.NEW_TASK) {
+      const isEscKey = evt.key === EscKeyName.FULL || evt.key === EscKeyName.CUT;
+      if (isEscKey) {
+        this.destroy();
+      }
+    }
+
     document.removeEventListener(`keydown`, this._onCloseEdit);
   }
 
