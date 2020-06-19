@@ -9,8 +9,10 @@ import {
   removeElement,
 } from '../utils/render.js';
 import {
+  FilterType,
   SHOWING_TASKS_COUNT,
   SortType,
+  EMPTY_TASK
 } from '../const.js';
 
 
@@ -52,6 +54,14 @@ class BoardController {
     render(this._boardEl, this._tasksListComponent);
 
     this._renderTasksList(tasks);
+  }
+
+  addNewTask() {
+    this._tasksModel.setActiveFilter(FilterType.ALL);
+    this._updateTasks();
+    const taskController = new TaskController(this._tasksListEl, this._onDataChange, this._onViewChange);
+    this._showedTasksController.unshift(taskController);
+    taskController.render(EMPTY_TASK);
   }
 
   _setCountRender() {
@@ -130,7 +140,6 @@ class BoardController {
 
   _renderTasksList(tasks) {
     const tasksForRender = tasks.slice(0, this._showingTasksCount);
-
     this._removeTasks();
 
     tasksForRender.forEach((task) => {

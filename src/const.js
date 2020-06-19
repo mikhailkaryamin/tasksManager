@@ -29,6 +29,27 @@ const FilterType = {
   ARCHIVE: `archive`,
 };
 const SHOWING_TASKS_COUNT = 8;
+const EMPTY_TASK = {
+  id: String(Date.now() + Math.random() * 10),
+  description: ``,
+  dueDate: null,
+  repeatingDays: {
+    "mo": false,
+    "tu": false,
+    "we": false,
+    "th": false,
+    "fr": false,
+    "sa": false,
+    "su": false,
+  },
+  color: `green`,
+  isArchive: false,
+  isFavorite: false,
+};
+const NodePosition = {
+  APPEND: `append`,
+  PREPEND: `prepend`,
+};
 
 export {
   Color,
@@ -40,4 +61,6 @@ export {
   SHOWING_TASKS_COUNT,
   SortType,
   TASK_COUNT,
+  EMPTY_TASK,
+  NodePosition,
 };

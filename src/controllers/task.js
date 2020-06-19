@@ -5,6 +5,10 @@ import {
   render,
   removeElement,
 } from '../utils/render.js';
+import {
+  EMPTY_TASK,
+  NodePosition,
+} from '../const.js';
 import {onEscKeyDown} from '../utils/common.js';
 
 class TaskController {
@@ -26,6 +30,11 @@ class TaskController {
     this._cardTaskEdit = new CardTaskEditComponent(task);
 
     this._subscribeOnEvents(task);
+
+    if (task === EMPTY_TASK) {
+      render(this._container, this._cardTaskEdit, NodePosition.PREPEND);
+      return;
+    }
 
     if (oldCardTaskComponent && oldCardTaskEditComponent) {
       replaceElement(this._cardTask, oldCardTaskComponent);
