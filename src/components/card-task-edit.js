@@ -1,5 +1,6 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
 import flatpickr from "flatpickr";
+import {encode} from "he";
 import "flatpickr/dist/themes/light.css";
 import {
   DAYS,
@@ -77,7 +78,7 @@ class CardTaskEdit extends AbstractSmartComponent {
 
   getData() {
     const formData = {
-      description: this._description,
+      description: encode(this._description),
       color: this._color,
       dueDate: this._dueDate,
       repeatingDays: Object.assign({}, this._repeatingDays),
