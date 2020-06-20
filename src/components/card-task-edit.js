@@ -261,6 +261,7 @@ class CardTaskEdit extends AbstractSmartComponent {
 
       if (this._isRepeatingTask) {
         this._isDateShowing = false;
+        this._dueDate = null;
       }
       this._resetRepeatingDays();
       this.rerender();

@@ -65,10 +65,6 @@ class BoardController {
     taskController.render(EMPTY_TASK);
   }
 
-  _setCountRender() {
-    this._showingTasksCount += SHOWING_TASKS_COUNT;
-  }
-
   _getSortedTasks() {
     const tasks = this._tasksModel.getTasks();
     let sortedTasks = [];
@@ -161,6 +157,18 @@ class BoardController {
   _removeTasks() {
     this._showedTasksController.forEach((taskController) => taskController.destroy());
     this._showedTasksController.length = 0;
+  }
+
+  _setCountRender() {
+    this._showingTasksCount += SHOWING_TASKS_COUNT;
+  }
+
+  _setHideClass() {
+    this._boardComponent.hide();
+  }
+
+  _setShowClass() {
+    this._boardComponent.show();
   }
 
   _updateTasks() {
