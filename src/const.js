@@ -8,27 +8,12 @@ const Color = {
 };
 
 const COLORS = Object.values(Color);
+const CONTROL_MENU_ID_PREFIX = `control__`;
 const DESCRIPTION_ITEMS = [
   `Est tempor sint est nostrud nostrud exercitation.`,
   `Exercitation consequat elit irure eu magna proident commodo.`,
   `Amet ad reprehenderit est eiusmod esse.`,
 ];
-const TASK_COUNT = 50;
-const FILTER_ID_PREFIX = `filter__`;
-const SortType = {
-  DATE_DOWN: `date-down`,
-  DATE_UP: `date-up`,
-  DEFAULT: `default`,
-};
-const FilterType = {
-  ALL: `all`,
-  OVERDUE: `overdue`,
-  TODAY: `today`,
-  FAVORITES: `favorites`,
-  REPEATING: `repeating`,
-  ARCHIVE: `archive`,
-};
-const SHOWING_TASKS_COUNT = 8;
 const EMPTY_TASK = {
   id: String(Date.now() + Math.random() * 10),
   description: ``,
@@ -46,6 +31,25 @@ const EMPTY_TASK = {
   isArchive: false,
   isFavorite: false,
 };
+const FILTER_ID_PREFIX = `filter__`;
+const MIN_DESCRIPTION_LENGTH = 1;
+const MAX_DESCRIPTION_LENGTH = 140;
+const TASK_COUNT = 50;
+const TAG_INPUT = `INPUT`;
+const SHOWING_TASKS_COUNT = 8;
+const SortType = {
+  DATE_DOWN: `date-down`,
+  DATE_UP: `date-up`,
+  DEFAULT: `default`,
+};
+const FilterType = {
+  ALL: `all`,
+  OVERDUE: `overdue`,
+  TODAY: `today`,
+  FAVORITES: `favorites`,
+  REPEATING: `repeating`,
+  ARCHIVE: `archive`,
+};
 const NodePosition = {
   APPEND: `append`,
   PREPEND: `prepend`,
@@ -54,16 +58,20 @@ const ModeController = {
   NEW_TASK: `newTask`,
   DEFAULT: `default`,
 };
-const MIN_DESCRIPTION_LENGTH = 1;
-const MAX_DESCRIPTION_LENGTH = 140;
 const EscKeyName = {
   FULL: `Escape`,
   CUT: `Esc`,
+};
+const MenuItem = {
+  NEW_TASK: `new-task`,
+  TASKS: `task`,
+  STATISTICS: `statistic`,
 };
 
 export {
   Color,
   COLORS,
+  CONTROL_MENU_ID_PREFIX,
   DAYS,
   DESCRIPTION_ITEMS,
   EscKeyName,
@@ -72,9 +80,11 @@ export {
   SHOWING_TASKS_COUNT,
   SortType,
   TASK_COUNT,
+  TAG_INPUT,
   EMPTY_TASK,
   NodePosition,
   ModeController,
   MIN_DESCRIPTION_LENGTH,
   MAX_DESCRIPTION_LENGTH,
+  MenuItem,
 };
