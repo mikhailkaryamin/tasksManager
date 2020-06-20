@@ -62,7 +62,7 @@ const EscKeyName = {
   FULL: `Escape`,
   CUT: `Esc`,
 };
-const TypeMenu = {
+const MenuItem = {
   NEW_TASK: `new-task`,
   TASKS: `task`,
   STATISTICS: `statistic`,
@@ -86,5 +86,5 @@ export {
   ModeController,
   MIN_DESCRIPTION_LENGTH,
   MAX_DESCRIPTION_LENGTH,
-  TypeMenu,
+  MenuItem,
 };

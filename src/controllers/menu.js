@@ -16,10 +16,6 @@ class MenuController {
     render(container, this._menuComponent);
     this._menuComponent.setMenuClickHandler(this._onPressButtonMenu);
   }
-
-  // _onAddTaskButton() {
-  //   this._boardController.addNewTask();
-  // }
 }
 
 export default MenuController;

@@ -41,6 +41,18 @@ class BoardController {
     this._tasksModel.setFilterChangeHandler(this._onFilterChange);
   }
 
+  addNewTask() {
+    this._tasksModel.setActiveFilter(FilterType.ALL);
+    this._updateTasks();
+    const taskController = new TaskController(this._tasksListEl, this._onDataChange, this._onViewChange, ModeController.NEW_TASK);
+    this._showedTasksController.unshift(taskController);
+    taskController.render(EMPTY_TASK);
+  }
+
+  hide() {
+    this._boardComponent.hide();
+  }
+
   render() {
     render(this._container, this._boardComponent);
 
@@ -57,12 +69,8 @@ class BoardController {
     this._renderTasksList(tasks);
   }
 
-  addNewTask() {
-    this._tasksModel.setActiveFilter(FilterType.ALL);
-    this._updateTasks();
-    const taskController = new TaskController(this._tasksListEl, this._onDataChange, this._onViewChange, ModeController.NEW_TASK);
-    this._showedTasksController.unshift(taskController);
-    taskController.render(EMPTY_TASK);
+  show() {
+    this._boardComponent.show();
   }
 
   _getSortedTasks() {
@@ -161,14 +169,6 @@ class BoardController {
 
   _setCountRender() {
     this._showingTasksCount += SHOWING_TASKS_COUNT;
-  }
-
-  _setHideClass() {
-    this._boardComponent.hide();
-  }
-
-  _setShowClass() {
-    this._boardComponent.show();
   }
 
   _updateTasks() {

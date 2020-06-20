@@ -8,7 +8,7 @@ import {
   CONTROL_MENU_ID_PREFIX,
   TASK_COUNT,
   TAG_INPUT,
-  TypeMenu,
+  MenuItem,
 } from './const.js';
 import {render} from './utils/render.js';
 
@@ -39,18 +39,18 @@ render(mainEl, statisticComponent);
 
 const controlPagesMenu = (pageName) => {
   switch (pageName) {
-    case (TypeMenu.NEW_TASK):
-      boardController._setShowClass();
+    case (MenuItem.NEW_TASK):
+      boardController.show();
       statisticComponent.hide();
       boardController.addNewTask();
       break;
-    case (TypeMenu.TASKS):
-      boardController._setShowClass();
+    case (MenuItem.TASKS):
+      boardController.show();
       statisticComponent.hide();
       break;
-    case (TypeMenu.STATISTICS):
+    case (MenuItem.STATISTICS):
       statisticComponent.show();
-      boardController._setHideClass();
+      boardController.hide();
       break;
-}
+  }
 };

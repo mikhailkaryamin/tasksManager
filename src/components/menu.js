@@ -1,5 +1,5 @@
 import AbstractComponent from './abstract-component.js';
-import {TypeMenu} from '../const.js';
+import {MenuItem} from '../const.js';
 
 const MenuDescription = {
   NEW_TASK: `+ ADD NEW TASK`,
@@ -17,7 +17,7 @@ const createMenuMarkup = (type, description) => {
     />
     <label
       for="control__${type}"
-      class="control__label ${type === TypeMenu.NEW_TASK ? `control__label--new-task` : ``}"
+      class="control__label ${type === MenuItem.NEW_TASK ? `control__label--new-task` : ``}"
     >
       ${description}
     </label
@@ -27,8 +27,8 @@ const createMenuMarkup = (type, description) => {
 
 
 const createMenuTemplate = () => {
-  const menuTemplate = Object.keys(TypeMenu).map((type) => {
-    return createMenuMarkup(TypeMenu[type], MenuDescription[type]);
+  const menuTemplate = Object.keys(MenuItem).map((type) => {
+    return createMenuMarkup(MenuItem[type], MenuDescription[type]);
   }).join(``);
 
   return (
