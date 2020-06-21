@@ -24,6 +24,7 @@ class Tasks {
 
   setTasks(tasks) {
     this._tasks = Array.from(tasks);
+    this._callHandlers(this._dataChangeHandlers);
   }
 
   updateTask(id, newTask) {

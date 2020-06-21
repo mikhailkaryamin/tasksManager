@@ -13,6 +13,12 @@ import {
   isRepeating,
 } from '../utils/common.js';
 
+
+const DefaultData = {
+  deleteButtonText: `Delete`,
+  saveButtonText: `Save`,
+};
+
 const createColorMarkup = (colors, currentColor) => {
   return colors
     .map((color, index) => {
@@ -61,6 +67,7 @@ class CardTaskEdit extends AbstractSmartComponent {
     this._submitHandler = null;
     this._deleteButtonHandler = null;
     this._flatpickr = null;
+    this._externalData = DefaultData;
     this._isDateShowing = !!task.dueDate;
     this._color = task.color;
     this._repeatingDays = Object.assign({}, task.repeatingDays);
@@ -107,6 +114,11 @@ class CardTaskEdit extends AbstractSmartComponent {
     super.removeElement();
   }
 
+  setData(data) {
+    this._externalData = Object.assign({}, DefaultData, data);
+    this.rerender();
+  }
+
   setSubmitHandler(cb) {
     this.getElement().querySelector(`.card__save`).addEventListener(`click`, cb);
 
@@ -137,6 +149,9 @@ class CardTaskEdit extends AbstractSmartComponent {
 
     const colorsMarkup = createColorMarkup(COLORS, this._color);
     const repeatingDaysMarkup = createRepeatingDaysMarkup(DAYS, this._repeatingDays);
+
+    const deleteButtonText = this._externalData.deleteButtonText;
+    const saveButtonText = this._externalData.saveButtonText;
 
     return (
       `<article class="card card--edit card--${this._color} ${repeatClass} ${deadlineClass}">
@@ -207,9 +222,11 @@ class CardTaskEdit extends AbstractSmartComponent {
                 type="submit"
                 ${this._isDisabledSaveButton() ? `disabled` : ``}
               >
-                save
+                ${saveButtonText}
               </button>
-              <button class="card__delete" type="button">delete</button>
+              <button class="card__delete" type="button">
+                ${deleteButtonText}
+              </button>
             </div>
           </div>
         </form>

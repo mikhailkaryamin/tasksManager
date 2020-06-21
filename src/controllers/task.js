@@ -1,5 +1,6 @@
 import CardTaskComponent from '../components/card-task.js';
 import CardTaskEditComponent from '../components/card-task-edit.js';
+import TaskModel from '../models/task.js';
 import {
   replaceElement,
   render,
@@ -11,6 +12,19 @@ import {
   NodePosition,
 } from '../const.js';
 import {onEscKeyDown} from '../utils/common.js';
+
+const SHAKE_ANIMATION_TIMEOUT = 600;
+
+const parseFormData = (formData) => {
+  return new TaskModel({
+    "description": formData.description,
+    "due_date": formData.dueDate,
+    "repeating_days": Object.assign({}, formData.repeatingDays),
+    "color": formData.color,
+    "is_favorite": false,
+    "is_done": false,
+  });
+};
 
 class TaskController {
   constructor(container, onDataChange, onViewChange, modeController) {
@@ -64,10 +78,33 @@ class TaskController {
     replaceElement(this._cardTask, this._cardTaskEdit);
   }
 
+  shake() {
+    this._cardTaskEdit.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+    this._cardTask.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+
+    setTimeout(() => {
+      this._cardTaskEdit.getElement().style.animation = ``;
+      this._cardTask.getElement().style.animation = ``;
+
+      this._cardTaskEdit.setData({
+        saveButtonText: `Save`,
+        deleteButtonText: `Delete`,
+      });
+
+    }, SHAKE_ANIMATION_TIMEOUT);
+  }
+
   _subscribeOnEvents(task) {
     this._cardTaskEdit.setSubmitHandler((evt) => {
-      const newData = this._cardTaskEdit.getData();
       evt.preventDefault();
+
+      const formData = this._cardTaskEdit.getData();
+      const newData = parseFormData(formData);
+
+      this._cardTaskEdit.setData({
+        saveButtonText: `Saving...`,
+      });
+
       this._onDataChange(this, task, newData);
       this._replaceEditToTask();
       document.removeEventListener(`keydown`, this._onCloseEdit);
@@ -79,23 +116,25 @@ class TaskController {
     });
 
     this._cardTaskEdit.setDeleteButtonHandler(() => {
+      this._cardTaskEdit.setData({
+        deleteButtonText: `Deleting...`,
+      });
+
       this._onDataChange(this, task, null);
     });
 
     this._cardTask.setFavoriteButtonHandler(() => {
-      const newData = Object.assign({}, task, {
-        isFavorite: !task.isFavorite,
-      });
+      const newTask = TaskModel.clone(task);
+      newTask.isFavorite = !newTask.isFavorite;
 
-      this._onDataChange(this, task, newData);
+      this._onDataChange(this, task, newTask);
     });
 
     this._cardTask.setArchiveButtonHandler(() => {
-      const newData = Object.assign({}, task, {
-        isArchive: !task.isArchive,
-      });
+      const newTask = TaskModel.clone(task);
+      newTask.isArchive = !newTask.isArchive;
 
-      this._onDataChange(this, task, newData);
+      this._onDataChange(this, task, newTask);
     });
   }
 

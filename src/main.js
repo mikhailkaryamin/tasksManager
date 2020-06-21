@@ -1,21 +1,22 @@
+import API from './api.js';
 import BoardController from './controllers/board.js';
-import MenuController from './controllers/menu.js';
 import Filters from './controllers/filters.js';
+import MenuController from './controllers/menu.js';
 import Tasks from './models/tasks.js';
 import Statistic from './components/statistics.js';
-import {generateTasks} from './mock/task.js';
 import {
   CONTROL_MENU_ID_PREFIX,
-  TASK_COUNT,
   TAG_INPUT,
   MenuItem,
 } from './const.js';
 import {render} from './utils/render.js';
 
-const tasks = generateTasks(TASK_COUNT);
+const AUTHORIZATION = `Basic dXNlckBwYXSAfsafsafd`;
+const END_POINT = `https://11.ecmascript.pages.academy/task-manager`;
+
+const api = new API(END_POINT, AUTHORIZATION);
 
 const tasksModel = new Tasks();
-tasksModel.setTasks(tasks);
 
 const onPressButtonMenu = (evt) => {
   if (evt.target.tagName === TAG_INPUT) {
@@ -34,14 +35,12 @@ const dateFrom = (() => {
 const mainEl = document.querySelector(`.main`);
 const mainControlEl = mainEl.querySelector(`.main__control`);
 const menuController = new MenuController(mainControlEl, onPressButtonMenu);
-const boardController = new BoardController(mainEl, tasksModel);
+const boardController = new BoardController(mainEl, tasksModel, api);
 const filtersController = new Filters(mainEl, tasksModel);
 const statisticComponent = new Statistic({tasks: tasksModel, dateFrom, dateTo});
 
 menuController.render();
 filtersController.render();
-boardController.render();
-
 render(mainEl, statisticComponent);
 statisticComponent.hide();
 
@@ -62,3 +61,10 @@ const controlPagesMenu = (pageName) => {
       break;
   }
 };
+
+api.getTasks()
+  .then((tasks) => {
+    tasksModel.setTasks(tasks);
+    boardController.render();
+  });
+

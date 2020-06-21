@@ -18,9 +18,10 @@ import {
 
 
 class BoardController {
-  constructor(container, tasksModel) {
+  constructor(container, tasksModel, api) {
     this._container = container;
     this._tasksModel = tasksModel;
+    this._api = api;
     this._showedTasksController = [];
     this._boardComponent = new BoardComponent();
     this._boardEl = this._boardComponent.getElement();
@@ -93,25 +94,44 @@ class BoardController {
 
   _onDataChange(taskController, oldData, newData) {
     if (newData === null) {
-      this._tasksModel.removeTask(oldData.id);
-      const tasks = this._getSortedTasks();
-      this._renderTasksList(tasks);
+      this._api.deleteTask(oldData.id)
+        .then(() => {
+          this._tasksModel.removeTask(oldData.id);
+          const tasks = this._getSortedTasks();
+          this._renderTasksList(tasks);
+        })
+        .catch(() => {
+          taskController.shake();
+        });
       return;
     }
 
     if (oldData === EMPTY_TASK) {
-      const newTask = Object.assign({}, EMPTY_TASK, newData);
-      this._tasksModel.addTask(newTask);
-      const tasks = this._getSortedTasks();
-      this._renderTasksList(tasks);
+      this._api.createTask(newData)
+        .then((taskModel) => {
+          this._tasksModel.addTask(taskModel);
+          const tasks = this._getSortedTasks();
+          this._renderTasksList(tasks);
+        })
+        .catch(() => {
+          taskController.shake();
+        });
       return;
     }
 
-    const isSuccess = this._tasksModel.updateTask(oldData.id, newData);
+    this._api.updateTask(oldData.id, newData)
+      .then((taskModel) => {
+        const isSuccess = this._tasksModel.updateTask(oldData.id, taskModel);
 
-    if (isSuccess) {
-      taskController.render(newData);
-    }
+        if (isSuccess) {
+          taskController.render(taskModel);
+          this._updateTasks();
+        }
+      })
+      .catch(() => {
+        taskController.shake();
+      });
+
   }
 
   _onSortTypeChange(sortType) {
