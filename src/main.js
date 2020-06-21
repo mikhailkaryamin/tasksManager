@@ -1,4 +1,6 @@
-import API from './api.js';
+import API from './api/index.js';
+import Provider from './api/provider.js';
+import Store from './api/store.js';
 import BoardController from './controllers/board.js';
 import Filters from './controllers/filters.js';
 import MenuController from './controllers/menu.js';
@@ -13,8 +15,13 @@ import {render} from './utils/render.js';
 
 const AUTHORIZATION = `Basic dXNlckBwYXSAfsafsafd`;
 const END_POINT = `https://11.ecmascript.pages.academy/task-manager`;
+const STORE_PREFIX = `taskmanager-localstorage`;
+const STORE_VER = `v1`;
+const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
 
 const api = new API(END_POINT, AUTHORIZATION);
+const store = new Store(STORE_NAME, window.localStorage);
+const apiWithProvider = new Provider(api, store);
 
 const tasksModel = new Tasks();
 
@@ -35,7 +42,7 @@ const dateFrom = (() => {
 const mainEl = document.querySelector(`.main`);
 const mainControlEl = mainEl.querySelector(`.main__control`);
 const menuController = new MenuController(mainControlEl, onPressButtonMenu);
-const boardController = new BoardController(mainEl, tasksModel, api);
+const boardController = new BoardController(mainEl, tasksModel, apiWithProvider);
 const filtersController = new Filters(mainEl, tasksModel);
 const statisticComponent = new Statistic({tasks: tasksModel, dateFrom, dateTo});
 
@@ -62,9 +69,27 @@ const controlPagesMenu = (pageName) => {
   }
 };
 
-api.getTasks()
+apiWithProvider.getTasks()
   .then((tasks) => {
     tasksModel.setTasks(tasks);
     boardController.render();
   });
 
+window.addEventListener(`load`, () => {
+  navigator.serviceWorker.register(`/sw.js`)
+    .then(() => {
+      // Действие, в случае успешной регистрации ServiceWorker
+    }).catch(() => {
+      // Действие, в случае ошибки при регистрации ServiceWorker
+    });
+});
+
+window.addEventListener(`online`, () => {
+  document.title = document.title.replace(` [offline]`, ``);
+
+  apiWithProvider.sync();
+});
+
+window.addEventListener(`offline`, () => {
+  document.title += ` [offline]`;
+});
