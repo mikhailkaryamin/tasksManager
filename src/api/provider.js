@@ -24,23 +24,6 @@ class Provider {
     this._store = store;
   }
 
-  getTasks() {
-    if (isOnline()) {
-      return this._api.getTasks()
-        .then((tasks) => {
-          const items = createStoreStructure(tasks.map((task) => task.toRAW()));
-
-          this._store.setItem(items);
-
-          return tasks;
-        });
-    }
-
-    const storeTasks = Object.values(this._store.getItems());
-
-    return Promise.resolve(Task.parseTasks(storeTasks));
-  }
-
   createTask(task) {
     if (isOnline()) {
       return this._api.createTask(task)
@@ -59,23 +42,6 @@ class Provider {
     return Promise.resolve(localNewTask);
   }
 
-  updateTask(id, task) {
-    if (isOnline()) {
-      return this._api.updateTask(id, task)
-        .then((newTask) => {
-          this._store.setItem(newTask.id, newTask.toRAW());
-
-          return newTask;
-        });
-    }
-
-    const localTask = Task.clone(Object.assign(task, {id}));
-
-    this._store.setItem(id, localTask.toRAW());
-
-    return Promise.resolve(localTask);
-  }
-
   deleteTask(id) {
     if (isOnline()) {
       return this._api.deleteTask(id)
@@ -87,6 +53,23 @@ class Provider {
     return Promise.resolve();
   }
 
+  getTasks() {
+    if (isOnline()) {
+      return this._api.getTasks()
+        .then((tasks) => {
+          const items = createStoreStructure(tasks.map((task) => task.toRAW()));
+
+          this._store.setItem(items);
+
+          return tasks;
+        });
+    }
+
+    const storeTasks = Object.values(this._store.getItems());
+
+    return Promise.resolve(Task.parseTasks(storeTasks));
+  }
+  
   sync() {
     if (isOnline()) {
       const storeTasks = Object.values(this._store.getItems());
@@ -103,6 +86,23 @@ class Provider {
     }
 
     return Promise.reject(new Error(`Sync data failed`));
+  }
+
+  updateTask(id, task) {
+    if (isOnline()) {
+      return this._api.updateTask(id, task)
+        .then((newTask) => {
+          this._store.setItem(newTask.id, newTask.toRAW());
+
+          return newTask;
+        });
+    }
+
+    const localTask = Task.clone(Object.assign(task, {id}));
+
+    this._store.setItem(id, localTask.toRAW());
+
+    return Promise.resolve(localTask);
   }
 }
 
