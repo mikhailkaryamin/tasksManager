@@ -1,5 +1,6 @@
 import AbstractComponent from './abstract-component.js';
-import {FILTER_ID_PREFIX} from '../const.js';
+
+const FILTER_ID_PREFIX = `filter__`;
 
 const getFilterNameById = (id) => {
   return id.substring(FILTER_ID_PREFIX.length);
@@ -18,6 +19,7 @@ const createFilterMarkup = (filter, isChecked) => {
       class="filter__input visually-hidden"
       name="filter"
       ${isChecked ? `checked` : ``}
+      ${count ? `` : `disabled`}
     />
     <label for="filter__${name}" class="filter__label">
       ${name}

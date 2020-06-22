@@ -7,22 +7,43 @@ import TaskController from './task.js';
 import {
   render,
   removeElement,
+  replaceElement,
 } from '../utils/render.js';
 import {
-  EMPTY_TASK,
   FilterType,
   ModeController,
-  SHOWING_TASKS_COUNT,
   SortType,
 } from '../const.js';
 
+const EMPTY_TASK = {
+  id: String(Date.now() + Math.random() * 10),
+  description: ``,
+  dueDate: null,
+  repeatingDays: {
+    "mo": false,
+    "tu": false,
+    "we": false,
+    "th": false,
+    "fr": false,
+    "sa": false,
+    "su": false,
+  },
+  color: `green`,
+  isArchive: false,
+  isFavorite: false,
+};
+const SHOWING_TASKS_COUNT = 8;
 
 class BoardController {
   constructor(container, tasksModel, api) {
+    this._api = api;
     this._container = container;
     this._tasksModel = tasksModel;
-    this._api = api;
+
     this._showedTasksController = [];
+    this._showingTasksCount = SHOWING_TASKS_COUNT;
+    this._sortType = SortType.DEFAULT;
+
     this._boardComponent = new BoardComponent();
     this._boardEl = this._boardComponent.getElement();
     this._loadMoreButtonComponent = new LoadMoreButtonComponent();
@@ -30,13 +51,12 @@ class BoardController {
     this._sortComponent = new SortComponent();
     this._tasksListComponent = new TasksListComponent();
     this._tasksListEl = this._tasksListComponent.getElement();
+
     this._onDataChange = this._onDataChange.bind(this);
     this._onViewChange = this._onViewChange.bind(this);
     this._onSortTypeChange = this._onSortTypeChange.bind(this);
     this._onFilterChange = this._onFilterChange.bind(this);
     this._onLoadMoreButton = this._onLoadMoreButton.bind(this);
-    this._showingTasksCount = SHOWING_TASKS_COUNT;
-    this._sortType = SortType.DEFAULT;
 
     this._sortComponent.setSortTypeChangeHandler(this._onSortTypeChange);
     this._tasksModel.setFilterChangeHandler(this._onFilterChange);
@@ -58,9 +78,8 @@ class BoardController {
     render(this._container, this._boardComponent);
 
     const tasks = this._tasksModel.getTasks();
-
     if (tasks.length === 0) {
-      render(this._boardEl, this._noTasksComponent.getElement());
+      render(this._boardEl, this._noTasksComponent);
       return;
     }
 
@@ -193,6 +212,11 @@ class BoardController {
 
   _updateTasks() {
     const tasks = this._tasksModel.getTasks();
+
+    if (tasks.length === 0) {
+      replaceElement(this._tasksListComponent, this._noTasksComponent);
+    }
+
     this._removeTasks();
     this._resetCount();
     this._renderTasksList(tasks);

@@ -22,23 +22,22 @@ class Tasks {
     return this._tasks;
   }
 
-  setTasks(tasks) {
-    this._tasks = Array.from(tasks);
-    this._callHandlers(this._dataChangeHandlers);
-  }
-
-  updateTask(id, newTask) {
+  removeTask(id) {
     const indexTask = this._tasks.findIndex((task) => task.id === id);
 
     if (indexTask === -1) {
       return false;
     }
 
-    this._tasks = [].concat(this._tasks.slice(0, indexTask), newTask, this._tasks.slice(indexTask + 1));
-
+    this._tasks = [].concat(this._tasks.slice(0, indexTask), this._tasks.slice(indexTask + 1));
     this._callHandlers(this._dataChangeHandlers);
 
     return true;
+  }
+
+  setTasks(tasks) {
+    this._tasks = Array.from(tasks);
+    this._callHandlers(this._dataChangeHandlers);
   }
 
   setDataChangeHandler(handler) {
@@ -54,14 +53,15 @@ class Tasks {
     this._callHandlers(this._filterChangeHandlers);
   }
 
-  removeTask(id) {
+  updateTask(id, newTask) {
     const indexTask = this._tasks.findIndex((task) => task.id === id);
 
     if (indexTask === -1) {
       return false;
     }
 
-    this._tasks = [].concat(this._tasks.slice(0, indexTask), this._tasks.slice(indexTask + 1));
+    this._tasks = [].concat(this._tasks.slice(0, indexTask), newTask, this._tasks.slice(indexTask + 1));
+
     this._callHandlers(this._dataChangeHandlers);
 
     return true;
