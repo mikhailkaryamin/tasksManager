@@ -1,4 +1,4 @@
-const DAYS = [`mo`, `tu`, `we`, `th`, `fr`, `sa`, `su`];
+
 const Color = {
   BLACK: `black`,
   YELLOW: `yellow`,
@@ -72,7 +72,6 @@ export {
   Color,
   COLORS,
   CONTROL_MENU_ID_PREFIX,
-  DAYS,
   DESCRIPTION_ITEMS,
   EscKeyName,
   FilterType,

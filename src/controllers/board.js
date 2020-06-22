@@ -7,6 +7,7 @@ import TaskController from './task.js';
 import {
   render,
   removeElement,
+  replaceElement,
 } from '../utils/render.js';
 import {
   EMPTY_TASK,
@@ -192,6 +193,11 @@ class BoardController {
 
   _updateTasks() {
     const tasks = this._tasksModel.getTasks();
+
+    if (tasks.length === 0) {
+      replaceElement(this._tasksListComponent, this._noTasksComponent);
+    }
+
     this._removeTasks();
     this._resetCount();
     this._renderTasksList(tasks);

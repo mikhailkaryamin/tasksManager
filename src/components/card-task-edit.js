@@ -3,7 +3,6 @@ import flatpickr from "flatpickr";
 import {encode} from "he";
 import "flatpickr/dist/themes/light.css";
 import {
-  DAYS,
   COLORS,
   MIN_DESCRIPTION_LENGTH,
   MAX_DESCRIPTION_LENGTH,
@@ -13,7 +12,7 @@ import {
   isRepeating,
 } from '../utils/common.js';
 
-
+const DAYS = [`mo`, `tu`, `we`, `th`, `fr`, `sa`, `su`];
 const DefaultData = {
   deleteButtonText: `Delete`,
   saveButtonText: `Save`,
