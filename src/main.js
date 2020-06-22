@@ -1,29 +1,23 @@
 import API from './api/index.js';
-import Provider from './api/provider.js';
-import Store from './api/store.js';
 import BoardController from './controllers/board.js';
 import Filters from './controllers/filters.js';
 import MenuController from './controllers/menu.js';
-import TasksModel from './models/tasks.js';
+import Provider from './api/provider.js';
 import Statistic from './components/statistics.js';
+import Store from './api/store.js';
+import TasksModel from './models/tasks.js';
 import {
-  CONTROL_MENU_ID_PREFIX,
-  TAG_INPUT,
   MenuItem,
 } from './const.js';
 import {render} from './utils/render.js';
 
 const AUTHORIZATION = `Basic dXNlckBwYXSAfsafsafd`;
+const CONTROL_MENU_ID_PREFIX = `control__`;
 const END_POINT = `https://11.ecmascript.pages.academy/task-manager`;
 const STORE_PREFIX = `taskmanager-localstorage`;
 const STORE_VER = `v1`;
 const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
-
-const api = new API(END_POINT, AUTHORIZATION);
-const store = new Store(STORE_NAME, window.localStorage);
-const apiWithProvider = new Provider(api, store);
-
-const tasksModel = new TasksModel();
+const TAG_INPUT = `INPUT`;
 
 const onPressButtonMenu = (evt) => {
   if (evt.target.tagName === TAG_INPUT) {
@@ -38,6 +32,12 @@ const dateFrom = (() => {
   d.setDate(d.getDate() - 7);
   return d;
 })();
+
+const api = new API(END_POINT, AUTHORIZATION);
+const store = new Store(STORE_NAME, window.localStorage);
+const apiWithProvider = new Provider(api, store);
+
+const tasksModel = new TasksModel();
 
 const mainEl = document.querySelector(`.main`);
 const mainControlEl = mainEl.querySelector(`.main__control`);
@@ -78,9 +78,7 @@ apiWithProvider.getTasks()
 window.addEventListener(`load`, () => {
   navigator.serviceWorker.register(`/sw.js`)
     .then(() => {
-      // Действие, в случае успешной регистрации ServiceWorker
     }).catch(() => {
-      // Действие, в случае ошибки при регистрации ServiceWorker
     });
 });
 

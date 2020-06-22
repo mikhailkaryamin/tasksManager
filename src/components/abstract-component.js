@@ -29,14 +29,14 @@ class AbstractComponent {
     }
   }
 
+  removeElement() {
+    this._element = null;
+  }
+
   show() {
     if (this._element) {
       this._element.classList.remove(HIDDEN_CLASS);
     }
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
 

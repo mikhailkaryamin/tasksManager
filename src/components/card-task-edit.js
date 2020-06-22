@@ -3,20 +3,26 @@ import flatpickr from "flatpickr";
 import {encode} from "he";
 import "flatpickr/dist/themes/light.css";
 import {
-  COLORS,
-  MIN_DESCRIPTION_LENGTH,
-  MAX_DESCRIPTION_LENGTH,
-} from "../const.js";
-import {
   isOverdue,
   isRepeating,
 } from '../utils/common.js';
 
-const DAYS = [`mo`, `tu`, `we`, `th`, `fr`, `sa`, `su`];
+const Color = {
+  BLACK: `black`,
+  YELLOW: `yellow`,
+  BLUE: `blue`,
+  GREEN: `green`,
+  PINK: `pink`,
+};
 const DefaultData = {
   deleteButtonText: `Delete`,
   saveButtonText: `Save`,
 };
+
+const COLORS = Object.values(Color);
+const DAYS = [`mo`, `tu`, `we`, `th`, `fr`, `sa`, `su`];
+const MIN_DESCRIPTION_LENGTH = 1;
+const MAX_DESCRIPTION_LENGTH = 140;
 
 const createColorMarkup = (colors, currentColor) => {
   return colors

@@ -21,15 +21,15 @@ export default class Task {
     };
   }
 
+  static clone(data) {
+    return new Task(data.toRAW());
+  }
+
   static parseTask(data) {
     return new Task(data);
   }
 
   static parseTasks(data) {
     return data.map(Task.parseTask);
-  }
-
-  static clone(data) {
-    return new Task(data.toRAW());
   }
 }

@@ -28,14 +28,22 @@ const parseFormData = (formData) => {
 
 class TaskController {
   constructor(container, onDataChange, onViewChange, modeController) {
+    this._container = container;
+    this._modeController = modeController;
     this._onDataChange = onDataChange;
     this._onViewChange = onViewChange;
-    this._modeController = modeController;
-    this._container = container;
+
     this._cardTask = null;
     this._cardTaskEdit = null;
+
     this._onCloseEdit = this._onCloseEdit.bind(this);
     this._subscribeOnEvents = this._subscribeOnEvents.bind(this);
+  }
+
+  destroy() {
+    removeElement(this._cardTask);
+    removeElement(this._cardTaskEdit);
+    document.removeEventListener(`keydown`, this._onCloseEdit);
   }
 
   render(task) {
@@ -59,12 +67,6 @@ class TaskController {
     } else {
       render(this._container, this._cardTask);
     }
-  }
-
-  destroy() {
-    removeElement(this._cardTask);
-    removeElement(this._cardTaskEdit);
-    document.removeEventListener(`keydown`, this._onCloseEdit);
   }
 
   setDefaultView() {
@@ -92,6 +94,29 @@ class TaskController {
       });
 
     }, SHAKE_ANIMATION_TIMEOUT);
+  }
+
+  _onCloseEdit(evt) {
+    if (ModeController.DEFAULT) {
+      onEscKeyDown(evt, this._replaceEditToTask.bind(this));
+    }
+    if (ModeController.NEW_TASK) {
+      const isEscKey = evt.key === EscKeyName.FULL || evt.key === EscKeyName.CUT;
+      if (isEscKey) {
+        this.destroy();
+      }
+    }
+
+    document.removeEventListener(`keydown`, this._onCloseEdit);
+  }
+
+  _replaceTaskToEdit() {
+    this._onViewChange();
+    replaceElement(this._cardTaskEdit, this._cardTask);
+  }
+
+  _replaceEditToTask() {
+    replaceElement(this._cardTask, this._cardTaskEdit);
   }
 
   _subscribeOnEvents(task) {
@@ -136,29 +161,6 @@ class TaskController {
 
       this._onDataChange(this, task, newTask);
     });
-  }
-
-  _onCloseEdit(evt) {
-    if (ModeController.DEFAULT) {
-      onEscKeyDown(evt, this._replaceEditToTask.bind(this));
-    }
-    if (ModeController.NEW_TASK) {
-      const isEscKey = evt.key === EscKeyName.FULL || evt.key === EscKeyName.CUT;
-      if (isEscKey) {
-        this.destroy();
-      }
-    }
-
-    document.removeEventListener(`keydown`, this._onCloseEdit);
-  }
-
-  _replaceTaskToEdit() {
-    this._onViewChange();
-    replaceElement(this._cardTaskEdit, this._cardTask);
-  }
-
-  _replaceEditToTask() {
-    replaceElement(this._cardTask, this._cardTaskEdit);
   }
 }
 

@@ -17,24 +17,12 @@ const formatDate = {
   month: `long`,
 };
 
-const getUniqItems = (item, index, array) => {
-  return array.indexOf(item) === index;
-};
-
 const createPlaceholder = (dateFrom, dateTo) => {
   const format = (date) => {
     return date.toLocaleString(`en-GB`, formatDate);
   };
 
   return `${format(dateFrom)} - ${format(dateTo)}`;
-};
-
-const getTasksByDateRange = (tasks, dateFrom, dateTo) => {
-  return tasks.filter((task) => {
-    const dueDate = task.dueDate;
-
-    return dueDate >= dateFrom && dueDate <= dateTo;
-  });
 };
 
 const calculateBetweenDates = (from, to) => {
@@ -53,6 +41,18 @@ const calculateBetweenDates = (from, to) => {
 
 const calcUniqCountColor = (tasks, color) => {
   return tasks.filter((it) => it.color === color).length;
+};
+
+const getUniqItems = (item, index, array) => {
+  return array.indexOf(item) === index;
+};
+
+const getTasksByDateRange = (tasks, dateFrom, dateTo) => {
+  return tasks.filter((task) => {
+    const dueDate = task.dueDate;
+
+    return dueDate >= dateFrom && dueDate <= dateTo;
+  });
 };
 
 const renderColorsChart = (colorsCtx, tasks) => {
@@ -237,13 +237,13 @@ class Statistics extends AbstractSmartComponent {
     return createStatisticsTemplate({tasks: this._tasks.getTasks(), dateFrom: this._dateFrom, dateTo: this._dateTo});
   }
 
+  recoveryListeners() {}
+
   show() {
     super.show();
 
     this.rerender(this._tasks, this._dateFrom, this._dateTo);
   }
-
-  recoveryListeners() {}
 
   rerender(tasks, dateFrom, dateTo) {
     this._tasks = tasks;
@@ -253,6 +253,24 @@ class Statistics extends AbstractSmartComponent {
     super.rerender();
 
     this._renderCharts();
+  }
+
+  _applyFlatpickr(element) {
+    if (this._flatpickr) {
+      this._flatpickr.destroy();
+    }
+
+    this._flatpickr = flatpickr(element, {
+      altInput: true,
+      allowInput: true,
+      defaultDate: [this._dateFrom, this._dateTo],
+      mode: `range`,
+      onChange: (dates) => {
+        if (dates.length === 2) {
+          this.rerender(this._tasks, dates[0], dates[1]);
+        }
+      }
+    });
   }
 
   _renderCharts() {
@@ -279,24 +297,6 @@ class Statistics extends AbstractSmartComponent {
       this._colorsChart.destroy();
       this._colorsChart = null;
     }
-  }
-
-  _applyFlatpickr(element) {
-    if (this._flatpickr) {
-      this._flatpickr.destroy();
-    }
-
-    this._flatpickr = flatpickr(element, {
-      altInput: true,
-      allowInput: true,
-      defaultDate: [this._dateFrom, this._dateTo],
-      mode: `range`,
-      onChange: (dates) => {
-        if (dates.length === 2) {
-          this.rerender(this._tasks, dates[0], dates[1]);
-        }
-      }
-    });
   }
 }
 

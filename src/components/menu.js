@@ -47,17 +47,6 @@ class Menu extends AbstractComponent {
     this.getElement().addEventListener(`click`, cb);
   }
 
-  // setAddButtonHandler(cb) {
-  //   this.getElement().querySelector(`.control__label--new-task`).addEventListener(`click`, cb);
-  // }
-
-  // setTasksButtonHandler(cb) {
-  //   this.getElement().querySelector(`.control__label-task`).addEventListener(`click`, cb);
-  // }
-
-  // setStatisticButtonHandler(cb) {
-  //   this.getElement().querySelector(`.control__label-statistic`).addEventListener(`click`, cb);
-  // }
 }
 
 export default Menu;
