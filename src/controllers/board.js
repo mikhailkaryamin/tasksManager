@@ -58,9 +58,8 @@ class BoardController {
     render(this._container, this._boardComponent);
 
     const tasks = this._tasksModel.getTasks();
-
     if (tasks.length === 0) {
-      render(this._boardEl, this._noTasksComponent.getElement());
+      render(this._boardEl, this._noTasksComponent);
       return;
     }
 

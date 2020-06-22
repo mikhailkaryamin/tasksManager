@@ -4,7 +4,7 @@ import Store from './api/store.js';
 import BoardController from './controllers/board.js';
 import Filters from './controllers/filters.js';
 import MenuController from './controllers/menu.js';
-import Tasks from './models/tasks.js';
+import TasksModel from './models/tasks.js';
 import Statistic from './components/statistics.js';
 import {
   CONTROL_MENU_ID_PREFIX,
@@ -23,7 +23,7 @@ const api = new API(END_POINT, AUTHORIZATION);
 const store = new Store(STORE_NAME, window.localStorage);
 const apiWithProvider = new Provider(api, store);
 
-const tasksModel = new Tasks();
+const tasksModel = new TasksModel();
 
 const onPressButtonMenu = (evt) => {
   if (evt.target.tagName === TAG_INPUT) {
@@ -54,17 +54,17 @@ statisticComponent.hide();
 const controlPagesMenu = (pageName) => {
   switch (pageName) {
     case (MenuItem.NEW_TASK):
-      boardController.show();
       statisticComponent.hide();
+      boardController.show();
       boardController.addNewTask();
       break;
     case (MenuItem.TASKS):
-      boardController.show();
       statisticComponent.hide();
+      boardController.show();
       break;
     case (MenuItem.STATISTICS):
-      statisticComponent.show();
       boardController.hide();
+      statisticComponent.show();
       break;
   }
 };

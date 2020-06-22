@@ -1,15 +1,22 @@
 class Store {
   constructor(key, storage) {
-    this._storeKey = key;
     this._storage = storage;
+    this._storeKey = key;
   }
 
   getItems() {
     try {
-      return JSON.parse(this._storage.getItems(this._storeKey)) || {};
+      return JSON.parse(this._storage.getItem(this._storeKey)) || {};
     } catch (err) {
       return {};
     }
+  }
+
+  setItems(items) {
+    this._storage.setItem(
+        this._storeKey,
+        JSON.stringify(items)
+    );
   }
 
   setItem(key, value) {
@@ -22,13 +29,6 @@ class Store {
               [key]: value
             })
         )
-    );
-  }
-
-  setItems(items) {
-    this._storage.setItem(
-        this._storeKey,
-        JSON.stringify(items)
     );
   }
 
