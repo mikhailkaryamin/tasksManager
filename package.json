@@ -1,10 +1,9 @@
 {
   "name": "taskmanager",
   "version": "1.0.0",
-  "private": true,
-  "description": "Учебный проект «Менеджер задач» от HTML Academy",
+  "description": "Менеджер задач",
   "scripts": {
-    "build": "webpack",
+    "build": "webpack --mode production",
     "eslint": "eslint src/**/*.js",
     "test": "npm run eslint",
     "start": "npm run build && webpack-dev-server"
